@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:m="urn:org.vaadin.mvp.uibinder.message"
+  xmlns:r="urn:org.vaadin.mvp.uibinder.resource" 
+  xmlns:e="urn:org.vaadin.mvp.uibinder.event"
+  xmlns:v="urn:import:com.vaadin.ui">
+
+  <v:VerticalLayout sizeFull="" ui:field="mainLayout">
+    
+    <v:Panel height="60px">
+      <v:Label caption="Example Application" />
+    </v:Panel>
+    
+    <v:SplitPanel sizeFull="" ui:field="splitLayout">
+
+    </v:SplitPanel>
+    
+  </v:VerticalLayout>
+
+</ui:UiBinder>

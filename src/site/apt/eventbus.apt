@@ -1,0 +1,5 @@
+Using the EventBus infrastructure
+
+  The EventBus components provided with this module are mostly useful together with
+  the {{{./mvp.html}MVP infrastructure}}.
+ 

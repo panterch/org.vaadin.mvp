@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:m="urn:org.vaadin.mvp.uibinder.message"
+  xmlns:e="urn:org.vaadin.mvp.uibinder.event"
+  xmlns:v="urn:import:com.vaadin.ui"
+  xmlns:tc="urn:import:org.vaadin.mvp.uibinder" 
+  v:sizeFull="">
+  
+  <v:VerticalLayout height="67%">
+    <v:Label styleName="title" ui:field="title" m:caption="title.key" />
+    <v:Label styleName="para" ui:field="labelOne" m:caption="message.key" />
+    <v:Label styleName="para" ui:field="labelTwo" m:caption="message.default" />
+
+    <v:HorizontalLayout>
+      <v:Button styleName="small" e:click="save" ui:field="save"
+        m:caption="action.save" />
+      <v:Button styleName="small" e:click="cancel" ui:field="cancel"
+        m:caption="action.cancel" />
+      <tc:EventTestButton styleName="small" e:click="eventTest"
+        ui:field="eventButton" m:caption="action.event" />
+    </v:HorizontalLayout>
+
+  </v:VerticalLayout>
+</ui:UiBinder>

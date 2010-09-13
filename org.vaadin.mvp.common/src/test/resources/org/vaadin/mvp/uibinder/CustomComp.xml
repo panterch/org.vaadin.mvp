@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:UiBinder  
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:m="urn:org.vaadin.mvp.uibinder.message"
+  xmlns:e="urn:org.vaadin.mvp.uibinder.event"
+  xmlns:v="urn:import:com.vaadin.ui">
+
+  <v:VerticalLayout>
+  
+    <v:Label ui:field="label" m:caption="title.key" />
+    
+  </v:VerticalLayout>
+
+</ui:UiBinder>

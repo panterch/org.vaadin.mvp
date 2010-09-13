@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:m="urn:org.vaadin.mvp.uibinder.message"
+  xmlns:e="urn:org.vaadin.mvp.uibinder.event"
+  xmlns:v="urn:import:com.vaadin.ui"
+  xmlns:c="urn:import:org.vaadin.mvp.uibinder">
+  <v:VerticalLayout height="67%">
+  
+    <v:Label caption="Some Label" />
+
+    <c:CustomComp ui:field="customComp" />
+    
+  </v:VerticalLayout>
+</ui:UiBinder>

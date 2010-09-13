@@ -1,0 +1,34 @@
+Binding of custom components
+
+  Often one wants to use some general component compositions or also custom 
+  widgets that are reusable across the application.
+  
+  In fact there are two types of such reuseable components:
+  
+  * Custom widgets classes (Java code)
+  
+  * Compositions (Java code or declared in UI XML)
+  
+  []
+  
+  Introducing such custom components into a view declaration is simple. Actually
+  we have to declare another namespace to map it's Java package. Example 3 shows
+  the XML declaration of 1) a Java widget ({{{../ex/CustomButton.java}CustomButton.java}}) and 
+  2) including another XML declared composition 
+  ({{{../ex/CustomComposition.java}CustomComposition.java}} and 
+  {{{../ex/CustomComposition.xml}CustomComposition.xml}}):
+  
++---
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:v="urn:import:com.vaadin.ui"
+  xmlns:c="urn:import:com.example.component">
+  
+  <c:CustomButton />
+  
+  <c:CustomComposition />
+  
+</ui:UiBinder>
++---
+
+  Next chapter: {{{./i18n.html}Internationalization}}

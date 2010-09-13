@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:m="urn:org.vaadin.mvp.uibinder.message"
+  xmlns:v="urn:import:com.vaadin.ui"
+  xmlns:c="urn:import:com.example.component">
+  
+  <v:HorizontalLayout spacing="true">
+  
+    <v:Button m:caption="action.ok" styleName="small" />
+    <v:Button m:caption="action.cancel" styleName="small" />
+    
+  </v:HorizontalLayout>
+  
+</ui:UiBinder>

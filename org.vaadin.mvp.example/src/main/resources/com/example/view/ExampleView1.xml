@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:v="urn:import:com.vaadin.ui">
+  
+  <v:Label styleName="h2" caption="Example UI Composition" />
+  <v:Label caption="This is an example composition of widgets to demonstrate the UiBinder" />
+  
+  <v:TabSheet height="120px" width="400px">
+    
+    <v:VerticalLayout caption="Tab 1" margin="true" spacing="true">
+      <v:Label caption="This is the content of Tab 1." />
+      <v:Button caption="Click here" styleName="small" />
+    </v:VerticalLayout>
+    
+    <v:VerticalLayout caption="Tab 2">
+    </v:VerticalLayout>
+    
+  </v:TabSheet>
+  
+</ui:UiBinder>

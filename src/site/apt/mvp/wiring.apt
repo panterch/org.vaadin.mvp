@@ -1,0 +1,254 @@
+Wiring up the events
+
+  In the {{{../ex/UserAdminView.xml}UserAdminView.xml}} we've added to buttons,
+  <create> and <remove>. Let's add functionality to them, first adding event handler
+  declaration (don't forget to add the namespace declaration):
+  
++---
+<ui:UiBinder
+  ...
+  xmlns:e="urn:org.vaadin.mvp.uibinder.event">
+  
+...
+  <v:Button caption="create" styleName="small" e:click="createUser" />
+  <v:Button caption="remove" styleName="small" e:click="removeUser" />
+...
+
++---
+
+  In the {{{../ex/UserAdminEventBus.java}UserAdminEventBus.java}} add the events too:
+  
++---
+public interface UserAdminEventBus extends EventBus {
+
+  @Event(handlers = { UserAdminPresenter.class })
+  public void createUser();
+  
+  @Event(handlers = { UserAdminPresenter.class })
+  public void removeUser();
+  
+}
++---
+
+  Then we have to write the actual handler code in the presenter class 
+  {{{../ex/UserAdminPresenter.java}UserAdminPresenter.java}}. Additionally we
+  have to configure the table's datasource overriding <<<bind()>>>.
+  
++---
+...
+
+private BeanItemContainer<User> container;
+
+@Override
+public void bind() {
+  Table userList = this.view.getUserList();
+  container = new BeanItemContainer<User>(User.class);
+  userList.setContainerDataSource(container);
+  userList.setVisibleColumns(new String[]{"userName", "firstName", "lastName"});
+  userList.setImmediate(true);
+  userList.setSelectable(true);
+  userList.setMultiSelect(false);
+  userList.setEditable(true);
+}
+
+public void onCreateUser() {
+  // create an user
+  User u = new User();
+  u.setUserName("newuser");
+  u.setFirstName("First name");
+  u.setLastName("Last name");
+  this.container.addBean(u);
+}
+
+public void onRemoveUser() {
+  // check if a user is selected in the table
+  Table userList = this.view.getUserList();
+  Object selected = userList.getValue();
+  if (selected != null) {
+    this.container.removeItem(selected);
+  }
+}
+
+...
++---
+
+  For simplicity users ({{{../ex/User.java}User.java}}) are just added to a
+  <<<BeanItemContainer>>> or removed from it. In a real application the model 
+  would be accessed through some service, of course, and the table is configured 
+  with an approriate datasource that is backed by persistent storage
+  (i.e. <<<setContainerDataSource(...)>>>).
+  
+  Clicking the <create> button a new row is added to table:
+  
+[../ex/mvp_ex6.png]
+
+  
+* Using a popup window to edit
+
+  Instead of editing all the element inside of the table, editing a model entry
+  in a separate form may be more suitable in some situations.
+  
+  Let's add such behaviour using a popup window. The UI components of the window
+  are declared in {{{../ex/UserView.xml}UserView.xml}}:
+
++---
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:e="urn:org.vaadin.mvp.uibinder.event"
+  xmlns:v="urn:import:com.vaadin.ui"
+  v:sizeFull="" v:spacing="true" v:margin="true"
+  v:caption="User properties">
+  
+  <v:Form ui:field="userForm">
+  </v:Form>
+  
+  <v:HorizontalLayout spacing="true">
+    <v:Button caption="save" styleName="small" e:click="saveUser" />
+    <v:Button caption="cancel" styleName="small" e:click="cancelEditUser" />
+  </v:HorizontalLayout>
+  
+</ui:UiBinder>
++---
+
+  As always also a class and (optionally) an interface is required: 
+  {{{../ex/UserView.java}UserView.java}} and
+  {{{../ex/IUserView.java}IUserView.java}}.
+  
+  Next we must somehow get access the UiBinder used in the application to create
+  an instance of our user view. There are two different approaches to achieve
+  this:
+  
+  # In the application <<<ExampleApp>>> configure the presenter factory with a
+    <<<IPresenterFactoryCustomizer>>>:
+
++---
+class MyPresenterFactoryCustomizer implements org.vaadin.mvp.presenter.IPresenterFactoryCustomizer {
+
+  IPresenterFactory pf;
+  
+  MyPresenterFactoryCustomizer(IPresenterFactory pf) {
+    this.pf = pf;
+  }
+  
+  @Override
+  public void customize(IPresenter presenter) {
+    ((MyBasePresenter)presenter).setFactory(pf);
+  }
+  
+}
+
+// configure the factory
+...
+presenterFactory.setCustomizer(new MyPresenterFactoryCustomizer(presenterFactory));
+...
++---
+
+  # Use <<<FactoryPresenter>>> instead of <<<BasePresenter>>> for the application
+    presenters.
+  
+  []
+  
+  In the example we'll use the second approach with the advantage that the 
+  <<<FactoryPresenter>>> already provides a utility method to create view instances
+  directly. So modify the {{{../ex/UserAdminPresenter.java}UserAdminPresenter.java}}:
+
++---
+public class UserAdminPresenter extends FactoryPresenter<IUserAdminView, UserAdminEventBus> {
+...
++---
+
+  Then change the event handler code <<<onCreateUser>>>:
+
++---
+...
+private Window dialog = null;
+private Form userForm = null;
+...
+public void onCreateUser() throws ViewFactoryException {
+  // create view
+  UserView view = this.createView(UserView.class);
+  
+  // configure the form with bean item
+  this.userForm = view.getUserForm();
+  User u = new User();
+  u.setUserName("newuser");
+  u.setFirstName("First name");
+  u.setLastName("Last name");
+  BeanItem<User> beanItem = new BeanItem<User>(u);
+  this.userForm.setItemDataSource(beanItem);
+  
+  // create a window and keep a reference
+  this.dialog = new Window(view.getCaption());
+  this.dialog.setModal(true);
+  view.setCaption(null);
+  dialog.addComponent(view);
+}
+...
++---
+
+  So far it's possible to create view parts, but to display the popup window it is
+  required to have access to the applications main window.
+  
+  As displaying popup windows is a general purpose task, a good location to
+  add such handling is the <<<MainPresenter>>>. In our 
+  {{{../ex/UserAdminEventBus.java}UserAdminEventBus.java}} we declare an event
+  <<<showDialog>>> and use the <<<MainPresenter>>>:
+  
++---
+@Event(handlers = { MainPresenter.class })
+public void showDialog(Window dialog);
++---
+
+  In the {{{../ex/MainPresenter.java}MainPresenter.java}} handler code is required:
+  
++---
+public void onShowDialog(Window dialog) {
+  this.application.getMainWindow().addWindow(dialog);
+}
++---
+
+  To open the dialog <<<showDialog>>> must be called in the <<<onCreateUser>>> 
+  handler:
+
++---
+...
+this.eventBus.showDialog(this.dialog);
++---
+
+  Clicking <create> now produces the dialog window with the form:
+  
+[../ex/mvp_ex7.png]
+
+** Adding handlers for the dialog
+
+  Eventually two more handler method are required to complete the functionality,
+  one handler method for each dialog button, <save> and <cancel>:
+  
++---
+...
+public void onSaveUser() {
+  // get the user and add it to the container
+  BeanItem<User> item = (BeanItem<User>) this.userForm.getItemDataSource();
+  User u = item.getBean();
+  this.container.addBean(u);
+  
+  // close dialog
+  this.closeDialog();
+}
+
+public void onCancelEditUser() {
+  // close dialog only
+  this.closeDialog();
+}
+
+private void closeDialog() {
+  // dismiss the dialog
+  Window applicationWindow = (Window) this.dialog.getParent();
+  applicationWindow.removeWindow(this.dialog);
+  this.dialog = null;
+  this.userForm = null;
+}
+...
++---
+
+  Restart and test the application behaviour.
