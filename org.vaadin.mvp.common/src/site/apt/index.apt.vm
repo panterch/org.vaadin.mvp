@@ -1,0 +1,57 @@
+Vaadin MVP, UI Binding and EventBus
+
+  This module provides utilities to build applications
+  with the {{{http://www.vaadin.com}Vaadin}}-Framework.
+
+* Example code
+
+  All example code shown in the UiBinder and MVP documentation (in the final form) 
+  may be found in the module <<<org.vaadin.mvp.example>>>. The example project is 
+  configured as a ready-to-run web application. From the command line the application may be
+  run with Maven:
+  
++---
+mvn jetty:run
++---
+
+  Point your browser to {{{http://localhost:8080}http://localhost:8080}}.
+  
+* Declarative User Interface creation with UiBinder
+
+  The {{{./uibinding.html}UI Binding infrastructure}} allows to declare Vaadin 
+  user interface parts with XML - strongly inspired by 
+  {{{http://code.google.com/webtoolkit/doc/latest/DevGuideUiBinder.html}GWT UiBinder}}.
+  
+* MVP pattern support
+
+  The {{{./mvp.html}MVP components}} allow to build applications 
+  based on the Model-View-Presenter pattern.
+  
+  MVP and EventBus implementations are inspired by {{{http://code.google.com/p/mvp4g/}mvp4g}}. 
+
+* Event dispatching with EventBus
+
+  The simple {{{./eventbus.html}EventBus infrastructure}} is used 
+  together with the MVP components.
+
+* Including in your project
+
+  The simplest way to make use of this module is to add it to your Maven POM:
+  
++---
+<dependency>
+  <groupId>${project.groupId}</groupId>
+  <artifactId>${project.artifactId}</artifactId>
+  <version>${project.version}</version>
+</dependency>
++---
+
+  If you haven't built the module from source you may need to add the Vaadin
+  Maven Add-On repository in your pom as well.
+
++---
+<repository>
+   <id>vaadin-addons</id>
+   <url>http://maven.vaadin.com/vaadin-addons</url>
+</repository>
++---

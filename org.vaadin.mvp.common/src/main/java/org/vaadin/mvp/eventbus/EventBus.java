@@ -7,8 +7,4 @@ package org.vaadin.mvp.eventbus;
  */
 public interface EventBus {
 
-  // FIXME: maybe add a simple common dispatch method, receivers must be defined
-  // somehow
-  // public void dispatch(String event, Object ... args);
-  
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:v="urn:import:com.vaadin.ui"
+  xmlns:c="urn:import:com.example.component">
+  
+  <c:CustomButton />
+  
+  <c:CustomComposition />
+  
+</ui:UiBinder>

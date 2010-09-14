@@ -1,0 +1,79 @@
+Component Binding
+
+  We've built up a tree of component so far, but now we most probably need to
+  access certain (possibly deeply nested) components, for example to customize
+  them, bind interaction code and so on.
+  
+  Say we want to add a listener to the button from our first example 
+  ({{{../uibinder.html}UiBinder}}). We need a way to
+  access the button component from the code.
+
+* Declare the field name
+
+  First we add an attribute <<<ui:field="button">>> to the <<<v:Button>>> 
+  declaration from ExampleView1.xml as follows ({{{../ex/ExampleView2.xml}ExampleView2.xml}}):
+  
++---
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:v="urn:import:com.vaadin.ui">
+  
+  <v:Label styleName="h2" caption="Example UI Composition" />
+  <v:Label caption="This is an example composition of widgets to demonstrate the UiBinder" />
+  
+  <v:TabSheet fullSize="" height="120px" width="400px">
+    
+    <v:VerticalLayout caption="Tab 1" margin="true" spacing="true">
+      <v:Label caption="This is the content of Tab 1." />
+      
+      <!-- add ui:field attribute -->
+      <v:Button ui:field="button" caption="Click here" styleName="small" />
+    </v:VerticalLayout>
+    
+    <v:VerticalLayout caption="Tab 2">
+    </v:VerticalLayout>
+    
+  </v:TabSheet>
+  
+</ui:UiBinder>
++---
+
+* Add the field to the view instance
+
+  Additionally we need a field in our view class to reference the <<<Button>>>
+  ({{{../ex/ExampleView2.java}ExampleView2.java}}):
+
++---
+public class ExampleView2 extends VerticalLayout implements IUiBindable {
+  
+  @UiField
+  Button button;
+  
+}
++---
+
+  Note that the field must be named after the <<<ui:field>>>-name and it must
+  be annotated with the <<<@UiField>>> annotation.
+  
+  Now when we bind our view class the <<<Button>>>-Component will be injected
+  to our view instance and we can access the button instance, e.g. to add a listener 
+  ({{{../ex/ExampleView2Client.java}ExampleView2Client.java}}):
+
++---
+UiBinder uib = new UiBinder();
+ExampleView2 view = uib.bind(ExampleView2.class, Locale.getDefault(), null);
+Button button = view.getButton();
+// do something with the button...
+// button.addListener(...)
++---
+
+  Any component may be bound to the view class like this; the type of the property
+  in the view class must match the type of the component created declaratively.
+
+  Next chapter: {{{./customcomps.html}Custom Components}}
+  
+  
+
+  
+  

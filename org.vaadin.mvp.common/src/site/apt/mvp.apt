@@ -1,0 +1,241 @@
+Model-View-Presenter
+
+  The module provides supporting classes to build Vaadin applications using 
+  the Model-View-Presenter pattern.
+  
+* Quick start an MVP based application
+
+  Let's start with a simple application that combines the MVP with the UiBinder
+  infrastructure. Events are dispatched using an EventBus.
+
+** Create the Application
+
+  Assuming we have set up a web application project already, we first need a 
+  custom <<<com.vaadin.Application>>> ({{{./ex/ExampleApp.java}ExampleApp.java}}):
+  
++---
+public class ExampleApp extends Application {
+
+  /** Per application (session) event bus manager */
+  private EventBusManager ebm = new EventBusManager();
+  /** Per application presenter factory */
+  private PresenterFactory presenterFactory;
+  
+  @Override
+  public void init() {
+    // create an instance of a default presenter factory
+    this.presenterFactory = new PresenterFactory(ebm, getLocale());
+  }
+  
+  public IPresenterFactory getPresenterFactory() {
+    return this.presenterFactory;
+  }
+
+}
++---
+
+  * <<EventBusManager>>: Creates <<<EventBus>>> instances used to dispatch events
+  
+  * <<PresenterFactory>>: Creates instances of presenters configured with their 
+    view and eventbus
+    
+  []
+
+** Create a Presenter, View and EventBus
+
+  Obviously we need a first presenter as a starting point. We call it 
+  <<<MainPresenter>>> ({{{./ex/MainPresenter.java}MainPresenter.java}}):
+
++---
+public class MainPresenter extends BasePresenter<IMainView, MainEventBus>{
+
+}
++---
+
+  As you noticed the presenter extends <<<BasePresenter>>> which is parameterized
+  with a view type <<<IMainView>>> and a event bus type <<<MainEventBus>>>.
+  
+  For the view we need an implementation class, an interface and - as we'll use
+  a declarative view - an XML view definition:
+  
+  The view class (a window) {{{./ex/MainView.java}MainView.java}}:
+
++---
+public class MainView extends Window implements IMainView, IUiBindable {
+
+  @UiField
+  VerticalLayout mainLayout;
+  
+  @UiField
+  SplitPanel splitLayout;
+  
+  @Override
+  public void setMenu(Component menu) {
+    splitLayout.setFirstComponent(menu);
+  }
+
+  @Override
+  public void setContent(Component content) {
+    splitLayout.setSecondComponent(content);
+  }
+
+  @Override
+  public SplitPanel getSplitLayout() {
+    return splitLayout;
+  }
+  
+  @Override
+  public VerticalLayout getMainLayout() {
+    return mainLayout;
+  }
+
+}
++---
+
+  The view interface {{{./ex/IMainView.java}IMainView.java}}:
+
++---
+public interface IMainView {
+
+  public abstract void setMenu(Component menu);
+
+  public abstract void setContent(Component content);
+
+  public abstract SplitPanel getSplitLayout();
+
+  public abstract VerticalLayout getMainLayout();
+
+}
++---
+
+  The XML view declaration {{{./ex/MainView.xml}MainView.xml}}:
+
++---
+<ui:UiBinder xmlns:ui="urn:org.vaadin.mvp.uibinder" xmlns:t="urn:org.vaadin.mvp.uibinder.message"
+  xmlns:r="urn:org.vaadin.mvp.uibinder.resource" xmlns:e="urn:org.vaadin.mvp.uibinder.event"
+  xmlns:v="urn:import:com.vaadin.ui">
+
+    <v:VerticalLayout sizeFull="" ui:field="mainLayout">
+    
+    <v:Panel height="60px">
+      <v:Label caption="Example Application" />
+    </v:Panel>
+    
+    <v:SplitPanel sizeFull="" ui:field="splitLayout">
+      
+    </v:SplitPanel>
+    
+  </v:VerticalLayout>
+
+</ui:UiBinder>
++---
+
+  So much for the view. Now we have to create an interface that defines the 
+  main events ({{{./ex/MainEventBus.java}MainEventBus.java}}):
+
++---
+public interface MainEventBus extends EventBus {
+
+  @Event(handlers = { MainPresenter.class })
+  public void start(ExampleApp app);
+
+}
++---
+
+  Our <<<MainEventBus>>> interface must extend <<<EventBus>>>. For instance we
+  have one single event named <<<start()>>> taking the application as parameter.
+  
+  To run our example application for the first time, we only need a few more
+  lines of code.
+  
+  In the <<<ExampleApp>>> class' <<<init()>>> method we must create an instance of 
+  <<<MainPresenter>>> (assigned to a private member variable) and send a <<<start()>>> event:
+  
++---
+...
+
+/** Main presenter */
+private IPresenter<?, ? extends EventBus> mainPresenter;
+
+@Override
+public void init() {
+  // create an instance of a default presenter factory
+  this.presenterFactory = new PresenterFactory(ebm, getLocale());
+  
+  // request an instance of MainPresenter
+  mainPresenter = this.presenterFactory.createPresenter(MainPresenter.class);
+  MainEventBus eventBus = (MainEventBus) mainPresenter.getEventBus();
+  eventBus.start(this);
+  
+}
+
+...
++---
+
+  As our <<<MainPresenter>>> is the target of the start-event, we must add handler
+  code to it, and we must add a <<<@Presenter>>> annotation to its class to declare
+  the start view. So finally our <<<MainPresenter>>> class looks like this:
+
++---
+@Presenter(view = MainView.class)
+public class MainPresenter extends BasePresenter<IMainView, MainEventBus>{
+
+  private ExampleApp application; 
+  
+  public void onStart(ExampleApp app) {
+    // keep a reference to the application instance
+    this.application = app;
+    
+    // set the applications main windows (the view)
+    this.application.setMainWindow((Window) this.view);
+  }
+  
+}
++---
+
+  <<Note>>: as a convention, all events dispatched via the event bus are wired
+  to handler methods prefixed with <<<on...>>>, so the event <<<start>>> on the
+  main event bus is wired to a method named <<<onStart>>>.
+  
+
+** Running the application
+
+  When we run our application the first time, it looks like this:
+  
+[./ex/mvp_ex1.png]
+
+  Some tuning of the main layout seems to be done:
+  
+  * the SplitPanel should take up all the space below the header
+  
+  * the SplitPanel should be oriented horizontally instead of vertically
+  
+  * the width of the left part should be smaller as it will contain the menu
+  
+  []
+  
+  These requirements can't be achieved within the XML declaration, but the 
+  presenter offers a facility to <post process> the view components to do this.
+  That for we override the <<<bind()>>> method in our <<<MainPresenter>>>:
+  
++---
+@Override
+public void bind() {
+  VerticalLayout mainLayout = this.view.getMainLayout();
+  SplitPanel layoutPanel = this.view.getSplitLayout();
+  mainLayout.setExpandRatio(layoutPanel, 1.0f);
+  layoutPanel.setOrientation(SplitPanel.ORIENTATION_HORIZONTAL);
+  layoutPanel.setSplitPosition(150, SplitPanel.UNITS_PIXELS);
+}
++---
+
+  Now when restarting the application, the layout looks better:
+  
+[./ex/mvp_ex2.png]
+
+  Next, we want to add a menu and - of course - some content to the application.
+  
+  Read on in the next chapter: {{{./mvp/menu.html}Menu with MVP}}
+  
+  
+  

@@ -9,6 +9,13 @@
   <name>MVP for Vaadin</name>
   <packaging>pom</packaging>
 
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
   <repositories>
     <repository>
       <id>maven</id>
@@ -20,7 +27,22 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
+    <repository>
+      <id>vaadin-addons</id>
+      <url>http://maven.vaadin.com/vaadin-addons</url>
+    </repository>
   </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>vaadin-addons-plugins</id>
+      <url>http://maven.vaadin.com/vaadin-addons</url>
+    </pluginRepository>
+  </pluginRepositories>
+  
+  <scm>
+    <connection>scm:git:https://github.com/panter/org.vaadin.mvp</connection>
+  </scm>
 
   <modules>
     <module>org.vaadin.mvp.common</module>
@@ -152,6 +174,20 @@
         <configuration>
           <templateFile>${basedir}/src/site/template/maven-site.vm</templateFile>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <inherited>true</inherited>
+        <groupId>org.vaadin.addons.maven.plugins</groupId>
+        <artifactId>maven-vaadin-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>install</phase>
+            <goals>
+              <goal>addon</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>

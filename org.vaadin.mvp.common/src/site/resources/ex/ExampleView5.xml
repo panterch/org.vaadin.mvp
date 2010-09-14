@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:t="urn:org.vaadin.mvp.uibinder.message"
+  xmlns:r="urn:org.vaadin.mvp.uibinder.resource"
+  xmlns:v="urn:import:com.vaadin.ui"
+  xmlns:c="urn:import:com.example.component">
+  
+  <v:TabSheet fullSize="" height="120px" width="400px">
+    
+    <v:VerticalLayout caption="Tab 1" margin="true" spacing="true">
+      
+      
+    </v:VerticalLayout>
+    
+    <v:VerticalLayout caption="Tab 2" r:icon="images/copy.gif" margin="true" spacing="true">
+
+      <v:HorizontalLayout spacing="true">
+
+        <v:Button t:caption="action.save" r:icon="images/save.gif" styleName="small" />
+        <v:Button t:caption="action.cancel" r:icon="images/cancel.gif" styleName="small" />
+
+      </v:HorizontalLayout>
+
+    </v:VerticalLayout>
+  </v:TabSheet>
+  
+</ui:UiBinder>

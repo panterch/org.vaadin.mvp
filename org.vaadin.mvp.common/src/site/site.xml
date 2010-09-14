@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+  <bannerLeft>
+    <name>Vaadin MVP UI</name>
+    <src>img/mvp.png</src>
+  </bannerLeft>
+  <body>
+    <links>
+      <item name="Vaadin" href="http://vaadin.com" />
+      <item name="Maven 2" href="http://maven.apache.org/" />
+    </links>
+
+    <menu name="Vaadin MVP / UiBinder">
+      <item name="Introduction" href="index.html" />
+      <item name="UiBinder" href="uibinder.html">
+        <item name="Component Binding" href="ui/compbinding.html" />
+        <item name="Custom Components" href="ui/customcomps.html" />
+        <item name="I18n" href="ui/i18n.html" />
+        <item name="Resources" href="ui/resource.html" />
+        <item name="Event Binding" href="ui/eventbinding.html" />
+      </item>
+      <item name="MVP" href="mvp.html">
+        <item name="Add a Menu" href="mvp/menu.html" />
+        <item name="Add a Module" href="mvp/module.html" />
+        <item name="Wiring Events" href="mvp/wiring.html" />
+      </item>
+      <item name="EventBus" href="eventbus.html" />
+      <!-- <item name="Spring integration" href="mvpspring.html" /> -->
+    </menu>
+
+    <!-- <menu ref="modules" /> -->
+
+    <menu ref="reports" />
+
+
+  </body>
+
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-stylus-skin</artifactId>
+    <version>1.2</version>
+  </skin>
+</project>

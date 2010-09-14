@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:t="urn:org.vaadin.mvp.uibinder.message"
+  xmlns:r="urn:org.vaadin.mvp.uibinder.resource"
+  xmlns:e="urn:org.vaadin.mvp.uibinder.event"
+  xmlns:v="urn:import:com.vaadin.ui"
+  xmlns:c="urn:import:com.example.component">
+  
+  <v:Button t:caption="action.ok" e:click="okClicked" />
+  
+</ui:UiBinder>

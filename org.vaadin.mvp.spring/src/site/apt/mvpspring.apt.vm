@@ -1,0 +1,87 @@
+Integrating with Spring Framework
+
+* Create the Vaadin Application
+
+  We're supposing you're using a custom Vaadin servlet already that is capable of loading
+  the Spring application context (no such servlet is provided with the integration
+  module currently, but there are many examples around anyway).
+  
+  For the Vaadin application, subclass the <<<SpringMvpApplication>>>, like in this
+  example ({{{./ex/ExampleSpringApp.java}ExampleSpringApp.java}}):
+
++---
+@Component("springMvpApp")
+@Scope("prototype")
+public class ExampleSpringApp extends SpringMvpApplication {
+
+  private SpringMainPresenter mainPresenter;
+
+  @Override
+  public void preInit() {
+
+    this.presenterFactory.setLocale(getLocale());
+  }
+
+  @Override
+  public void postInit() {
+    mainPresenter = (SpringMainPresenter) presenterFactory.createPresenter("springMainPresenter");
+    mainPresenter.getEventBus().start(this);
+  }
+
+}
++---
+
+  * the application is defined as spring component, named so the servlet may find it
+  
+  * the application is further annotated with @Scope <prototype> so a new instance
+    is created for every session
+    
+  * two methods <<<preInit()>>> and <<<postInit()>>> must be implemented
+  
+  * <<<preInit()>>> allows to configure the presenter factory (which is already
+    loaded, e.g. set the locale
+  
+  * in the <<<postInit()>>> method the initial presenters are loaded and the 
+    application is startet
+    
+  * <<<Note>>> that presenters are loaded using their Spring <<BeanName>> (and not
+    the class as opposed to the <default> presenter factory
+  
+  []
+  
+* Declare annotation configuration
+
+  In order to load the necessary components are loaded into the spring application
+  context, add the following to the Spring <<<applicationContext.xml>>> (or whatever
+  you're Spring configuration is named like):
+  
++---
+...
+<context:annotation-config />
+<context:component-scan base-package="org.vaadin.mvp" />
+...
++---
+
+* Configure your presenters
+
+  Presenters may be configured either in Spring XML bean-config or with annotations
+  as well. In any case <<presenters must be configured with scope prototype>> as
+  they hold and manage the view state.
+  
+* Translation messages for XML UI components
+
+  The ViewFactory integration component building views based on XML UI declaration
+  is configured with an @Autowired <<<MessageSource>>> that is used to read
+  messages. Thus to use {{{./ui/i18n.html}translations}} in the view parts, one
+  should configure a Spring MessageSource: 
+  {{{http://static.springsource.org/spring/docs/3.0.4.RELEASE/spring-framework-reference/html/beans.html#context-functionality-messagesource}configuring Spring MessageSource}}.
+  
+* Custom ViewFactories for certain views
+
+  The ViewFactory provides a mechanism to use a custom view factory on a per-view
+  basis; when a view instance is requested a bean named 'ExampleView<ViewFactory>' 
+  is looked up in the application context; the bean must implement
+  the <<<IViewFactory>>> interface. 'ExampleView' is the simple class name of the
+  requested view.
+
+  

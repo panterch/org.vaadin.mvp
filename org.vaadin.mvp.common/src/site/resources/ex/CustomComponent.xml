@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:v="urn:import:com.vaadin.ui">
+  
+  <v:Label styleName="h2" caption="This component reusable" />
+  <v:Label caption="This is an example composition" />
+  
+</ui:UiBinder>

@@ -1,0 +1,91 @@
+Internationalization of UI Compositions
+
+  Web applications usually require translation of the UI to different 
+  languages. In Java often <<<ResourceBundle>>>s are used to achieve this, 
+  however, depending on the application framework used the approach may vary
+  (e.g. Spring Framework provides various <<<MessageSource>>> implementations).
+  
+  As seen in the examples before, the UiBinders <<<bind(...)>>> method expects an
+  argument <<<locale>>>. However it needs some message resources as well to be
+  able to provide translations, an instance of <<<IUiMessageSource>>> actually.
+
+* Configuring the UiBinder with a message source
+  
+  A simple implementation <<<ResourceBundleUiMessageSource>>> that uses 
+  <<<ResourceBundle>>> internally is provided.
+  Let's illustrate the usage in an example, starting with the client code
+  ({{{../ex/ExampleView4Client.java}ExampleView4Client.java}}):
+
++---
+UiBinder uib = new UiBinder();
+String baseName = "i18n/Resources";
+IUiMessageSource msgSource = new ResourceBundleUiMessageSource(baseName);
+uib.setUiMessageSource(msgSource);
+ExampleView4 germanView = uib.bind(ExampleView4.class, new Locale("de"), null);
+ExampleView4 englishView = uib.bind(ExampleView4.class, new Locale("en"), null);
++---
+
+  Here, we create an instance of <<<ResourceBundleUiMessageSource>>> passing in
+  a <<<baseName>>>. The base name denotes where translation messages are located
+  on the classpath, so next we have to add some translations.
+  
+  * create a folder named <<<i18n>>> in under <<<src/main/resources>>>
+  
+  * create 3 properties files in this folder: {{{../ex/Resources_en.properties}Resources_en.properties}}, 
+    {{{../ex/Resources_de.properties}Resources_de.properties}} and {{{../ex/Resources.properties}Resources.properties}}
+    
+  * add translation messages to these files
+    
+  []
+  
+[../ex/uib_ex4_project.png]
+
+  For example the german translation looks like this:
+  
++---
+action.ok=Ok
+action.cancel=Abbrechen
++---
+
+* Adding translation messages to components
+
+  So far we created some translations and configured the UiBinder to find 
+  translations. Now we need a view that actually makes use of these messages
+  ({{{../ex/ExampleView4.xml}ExampleView4.xml}}).
+  
++---
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:m="urn:org.vaadin.mvp.uibinder.message"
+  xmlns:v="urn:import:com.vaadin.ui"
+  xmlns:c="urn:import:com.example.component">
+  
+  <v:HorizontalLayout>
+  
+    <v:Button m:caption="action.ok" />
+    <v:Button m:caption="action.cancel" />
+    
+  </v:HorizontalLayout>
+  
+</ui:UiBinder>
++---
+  
+  * add a meta namespace <<<xmlns:m="urn:org.vaadin.mvp.uibinder.message">>> 
+    to the XML declaration of the view
+  
+  * set the captions of the buttons using the message (translation) namespace (prefix <<<m>>>),
+    the message key is set as attribute value
+    
+  []
+  
+  
+  The resulting views (english/german) look roughly like this:
+  
+[../ex/uib_ex4.png]
+
+
+  Conclusion: every attribute may be translated by using the <message>-namespace.
+  
+  Next chapter: {{{./resource.html}Binding theme resources}}
+ 
+  

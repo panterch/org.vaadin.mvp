@@ -1,0 +1,129 @@
+Event binding
+
+  Binding listeners to UI components usually requires quite a lot of boilerplate code.
+  The UiBinder provides an event binding mechanism that creates the listeners
+  behind the scenes so only actual handling code must be written. 
+  {{{../ex/ExampleView6.xml}ExampleView6.xml}} shows how to declare the click
+  event handling on a button. Note the <<<e:click>>>-attribute as well as the
+  additional namespace <<<xmlns:e="urn:org.vaadin.mvp.uibinder.event">>> declaration:
+  
++---
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:t="urn:org.vaadin.mvp.uibinder.message"
+  xmlns:r="urn:org.vaadin.mvp.uibinder.resource"
+  xmlns:e="urn:org.vaadin.mvp.uibinder.event"
+  xmlns:v="urn:import:com.vaadin.ui"
+  xmlns:c="urn:import:com.example.component">
+  
+  <v:Button t:caption="action.ok" e:click="okClicked" />
+  
+</ui:UiBinder>
++---
+
+  For the UiBinder to be able wire the event to actual handler code, we have to
+  provide an <<<IEventBinder>>> implementation, that is capable to create
+  an approriate listener (in the example an instance of <<<Button.ClickListener>>>)
+  and add it to the <<<Button>>> widget.
+  
+  The <<<EventDispatcherBinder>>> implementation of <<<IEventBinder>>> provides
+  the listener creation and wiring. The <<<EventDispatcherBinder>>> is configured 
+  with a dispatcher that forwards the event appropriately. In the example client
+  below we use the general purpose <<<ReflectiveEventDispatcher>>> that tries to 
+  find a method named after the event (<<<okClicked>>>) on the target object 
+  passed to the constructor ({{{../ex/ExampleView6Client.java}ExampleView6Client.java}}):
+  
++---
+public class ExampleView6Client {
+
+  public void createExampleView() throws UiBinderException {
+    UiBinder uib = new UiBinder();
+    
+    // create an event dispatcher that uses reflection to invoke a listener
+    // on this client object
+    IEventDispatcher dispatcher = new ReflectiveEventDispatcher(this);
+    
+    // create an event binder with the dispatcher
+    IEventBinder eventBinder = new EventDispatcherBinder(dispatcher);
+    
+    // pass the event binder to UiBinder to wire listeners 
+    ExampleView6 view = uib.bind(ExampleView6.class, new Locale("de"), eventBinder);
+  }
+  
+  public void okClicked(ClickEvent event) {
+    System.out.println("Ok clicked");
+  }
+  
+}
++---
+
+  As you assumed the method <<<okClicked(...)>>> in our client class is the
+  method that is finally invoked when clicking the button. Note that the method
+  takes one argument of type <<<ClickEvent>>>; the methods argument type <<must match
+  the event object produced by the component>>, otherwise the method to invoke
+  can't be found by the dispatcher. However, alternatively - if the event is
+  not of interest - the method may be declared without arguments as well.
+
+* Supported events / components
+
+  The default event binder implementation <<<EventDispatcherBinder>>> supports
+  the following events:
+  
+*------------------+--------------------------------+--------------------------+
+|<<Component type>>|<<Events / Listeners>>          | <<Attribute name>>       |
+*------------------+--------------------------------+--------------------------+
+|ComponentContainer| ComponentAttachListener        | e:componentAttach        |
+*------------------+--------------------------------+--------------------------+
+|ComponentContainer| ComponentDetachListener        | e:componentDetach        |
+*------------------+--------------------------------+--------------------------+
+|Property          | ValueChangeListener            | e:valueChange            |
+*------------------+--------------------------------+--------------------------+
+|Property          | ReadOnlyStatusChangeListener   | e:readOnlyStatusChange   |
+*------------------+--------------------------------+--------------------------+
+|Container         | PropertySetChangeListener      | e:propertySetChange      |
+*------------------+--------------------------------+--------------------------+
+|Container         | ItemSetChangeListener          | e:itemSetChange          |
+*------------------+--------------------------------+--------------------------+
+|FieldEvents       | BlurListener                   | e:blur                   |
+*------------------+--------------------------------+--------------------------+
+|FieldEvents       | FocusListener                  | e:focus                  |
+*------------------+--------------------------------+--------------------------+
+|LayoutEvents      | LayoutClickListener            | e:layoutClick            |
+*------------------+--------------------------------+--------------------------+
+|Button            | ClickListener                  | e:click                  |
+*------------------+--------------------------------+--------------------------+
+|MouseEvents       | ClickListener                  | e:mouseClick             |
+*------------------+--------------------------------+--------------------------+
+|MouseEvents       | DoubleClickListener            | e:mouseDoubleClick       |
+*------------------+--------------------------------+--------------------------+
+|Item              | PropertySetChangeListener      | e:itemPropertySetChangeListener |
+*------------------+--------------------------------+--------------------------+
+|ItemClickEvent    | ItemClickListener              | e:itemClick              |
+*------------------+--------------------------------+--------------------------+
+|Table             | ColumnResizeListener           | e:columnResize           |
+*------------------+--------------------------------+--------------------------+
+|Table             | HeaderClickListener            | e:headerClick            |
+*------------------+--------------------------------+--------------------------+
+|Table             | FooterClickListener            | e:footerClick            |
+*------------------+--------------------------------+--------------------------+
+|Tree              | CollapseListener               | e:collapse               |
+*------------------+--------------------------------+--------------------------+
+|Tree              | ExpandListener                 | e:expane                 |
+*------------------+--------------------------------+--------------------------+
+|TabSheet          | SelectedTabChangeListener      | e:selectedTabChange      |
+*------------------+--------------------------------+--------------------------+
+|Upload            | FailedListener                 | e:failed                 |
+*------------------+--------------------------------+--------------------------+
+|Upload            | FinishedListener               | e:finished               |
+*------------------+--------------------------------+--------------------------+
+|Upload            | ProgressListener               | e:progress               |
+*------------------+--------------------------------+--------------------------+
+|Upload            | StartedListener                | e:started                |
+*------------------+--------------------------------+--------------------------+
+|Upload            | SucceededListener              | e:succeeded              |
+*------------------+--------------------------------+--------------------------+
+|Window            | CloseListener                  | e:close                  |
+*------------------+--------------------------------+--------------------------+
+|Window            | ResizeListener                 | e:resize                 |
+*------------------+--------------------------------+--------------------------+
+

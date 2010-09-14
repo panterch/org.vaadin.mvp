@@ -1,0 +1,29 @@
+Vaadin MVP Spring integration
+
+  The {{{http://www.springsource.org/}Spring Application Framework}} is a popular
+  choice to build modular applications.
+  
+  The module <<<org.vaadin.mvp.spring>>> provides a small integration layer
+  for the MVP components. To include it in your application add the dependency 
+  to your pom.xml:
+  
++---
+<dependency>
+  <groupId>${project.groupId}</groupId>
+  <artifactId>org.vaadin.mvp.spring</artifactId>
+  <version>${project.version}</version>
+</dependency>
++---
+
+  If you haven't built the module from source you may need to add the Vaadin
+  Maven Add-On repository in your pom as well.
+
++---
+<repository>
+   <id>vaadin-addons</id>
+   <url>http://maven.vaadin.com/vaadin-addons</url>
+</repository>
++---
+  
+  {{{./mvpspring.html}This page}} provides information how to use it.
+  

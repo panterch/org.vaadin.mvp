@@ -13,7 +13,7 @@
 
   <artifactId>org.vaadin.mvp.common</artifactId>
   <version>0.9.0</version>
-  <name>MVP for Vaadin Common</name>
+  <name>MVP and UiBinder for Vaadin</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -49,13 +49,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <version>${easymock.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>${logback.version}</version>
@@ -63,7 +56,28 @@
     </dependency>
 
   </dependencies>
-
+  
+  <build>
+    <plugins>
+      <plugin>
+        <inherited>true</inherited>
+        <groupId>org.vaadin.addons.maven.plugins</groupId>
+        <artifactId>maven-vaadin-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>install</phase>
+            <goals>
+              <goal>addon</goal>
+            </goals>
+            <configuration>
+              <siteOutputDirectory>${basedir}/target/site</siteOutputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
   <reporting>
     <excludeDefaults>true</excludeDefaults>
     <plugins>

@@ -1,0 +1,137 @@
+UI Binding with XML Definitions
+
+  The UiBinder provides means to declare user interface parts
+  (i.e. compositions of widgets) in XML rather than by writing code. A very simple
+  example of the creation of a <<<Button>>> widget may illustrate this:
+  
+  A <<<Button>>> in code:
+
++---
+Button button = new Button();
+button.setCaption("Click me!");
+button.setStyleName("myButtonStyle");
++---
+
+  The same <<<Button>>> in XML:
+
++---
+<v:Button caption="Click me!" styleName="myButtonStyle" />
++---
+
+  The UiBinder support provided with this module is strongly inspired by the 
+  UiBinder component shipped with recent GWT releases, some concepts differ though.
+  
+* More Complete example
+
+  Of course in the example above lots of things have been left out for
+  simplicity. But the <<<UiBinder>>> facility is mostly useful to create 
+  compositions of widgets, but not for single <<<Label>>>s, <<<Button>>>s etc.
+  So let's have a look at a more complete example; we want to create a view like
+  shown below to start:
+  
+[./ex/uib_ex1.png] Example 1 - View composition with labels and a tab sheet
+
+  Basically we need to create two files: a class for the composition and a XML 
+  description. Assuming we're using Maven project setup, this looks like this:
+  
+[./ex/uib_ex1_project.png] Example 1 - Project and package layout
+
+  Notice that the XML definition filename and package (i.e. folder structure)
+  <<must match the Java class name and package structure>>. Otherwise the XML 
+  view definition can't be found by UiBinder.
+  
+** View class
+  
+  Our class looks like this ({{{./ex/ExampleView1.java}ExampleView1.java}}):
+
++---
+package com.example.view;
+
+import org.vaadin.mvp.uibinder.IUiBindable;
+import com.vaadin.ui.VerticalLayout;
+
+public class ExampleView extends VerticalLayout implements IUiBindable {
+}
++---
+
+  Two things are of special interest: 
+  
+  * the class extends an implementation of <<<com.vaadin.ui.ComponentContainer>>> 
+    (<<<VerticalLayout>>> in this case), this is necessary to be able to add child
+    components
+  
+  * the class implements an interface <<<IUiBindable>>> which is a marker interface
+    that must be present
+  
+  []
+
+
+** View XML declaration 
+ 
+  Now, the more interesting part is the actual UI definition ({{{./ex/ExampleView1.xml}ExampleView1.xml}}):
+
++---
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:v="urn:import:com.vaadin.ui">
+  
+  <v:Label styleName="h2" caption="Example UI Composition" />
+  <v:Label caption="This is an example composition of widgets to demonstrate the UiBinder" />
+  
+  <v:TabSheet fullSize="" height="120px" width="400px">
+    
+    <v:VerticalLayout caption="Tab 1" margin="true" spacing="true">
+      <v:Label caption="This is the content of Tab 1." />
+      <v:Button caption="Click here" styleName="small" />
+    </v:VerticalLayout>
+    
+    <v:VerticalLayout caption="Tab 2">
+    </v:VerticalLayout>
+    
+  </v:TabSheet>
+  
+</ui:UiBinder>
++---
+
+  Let's explore this UI declaration step by step:
+  
+  * <<Namespaces>>: Two namespaces are defined -  
+    <<<xmlns:ui="urn:org.vaadin.mvp.uibinder">>> and <<<xmlns:v="urn:import:com.vaadin.ui">>>. 
+    The <<<ui>>> namespace is a <meta> namespace and must be always present
+    whereas the second is an <import> namespace that declares a Java package to
+    locate actual user interface widgets.
+  
+  * <<UiBinder-Element>>: Root element of all view compositions that maps to the
+    view's class.
+    
+  * <<v:Label>>: A standard Vaadin widget; the widget's class is composed of 
+    the namespace (i.e. the package) and the tag name (i.e. simple class name),
+    thus <<<com.vaadin.ui.Label>>>.
+    
+  * <<Attributes>>: All properties of a widget that have basic type (String, 
+    double, etc.) and a single argument setter-method may be directly set on
+    a widget, e.g. the <<<caption="Example ...">>> attribute results in a call
+    <<<setCaption("Example...")>>> on the widget.
+    
+  * <<Nesting of components>>: If components are declared inside of other 
+    components (e.g. the <<<VerticalLayout>>>s inside the <<<TabSheet>>>) then
+    the outer component must be some kind of <<<ComponentContainer>>>, so child
+    components can be added to it (via the <<<addComponent(...)>>> method).
+  
+  []
+
+** Create the view
+
+  After all we want to create and use our view. This is straightforward, all we
+  need is an instance of <<<UiBinder>>> and call its <<<bind(...)>>> method
+  passing our view class ({{{./ex/ExampleView1Client.java}ExampleView1Client.java}}):
+  
++---
+UiBinder uib = new UiBinder();
+uib.bind(ExampleView1.class, Locale.getDefault(), null);
++---
+
+  For information about the other two parameters are discussed in the chapters 
+  {{{./ui/i18n.html}I18N}} and {{{./ui/eventbinding.html}Event Binding}} respectively.
+
+  Next chapter: {{{./ui/compbinding.html}Component Binding}}.

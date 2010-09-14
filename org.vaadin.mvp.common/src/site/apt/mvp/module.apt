@@ -1,0 +1,141 @@
+Adding the application module
+
+  We continue with our user administration module that we already created a
+  menu entry for in the chapter before.
+  
+  Again, we need a presenter and a view - in contrary to the menu presenter, we
+  want a separate event bus for the user administration module.
+
+  {{{../ex/UserAdminPresenter.java}UserAdminPresenter.java}} initially looks like
+  this:
+
++---
+@Presenter(view = UserAdminView.class)
+public class UserAdminPresenter extends BasePresenter<IUserAdminView, UserAdminEventBus> {
+}
++---
+
+  We start with a simple view containing just some labels and a table to list
+  active users, {{{../ex/UserAdminView.java}UserAdminView.java}} and 
+  {{{../ex/UserAdminView.xml}UserAdminView.xml}}:
+
++---
+public class UserAdminView extends VerticalLayout implements IUserAdminView, IUiBindable {
+  
+  @UiField
+  Table userList;
+
+  @Override
+  public Table getUserList() {
+    return userList;
+  }
+  
+}
++---
+
++---
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:v="urn:import:com.vaadin.ui"
+  v:sizeFull="">
+  
+  <v:Label styleName="h2" caption="User Administration" />
+  
+  <v:Label caption="Create, view, remove users here." />
+  
+  <v:Table ui:field="userList" width="300px" height="100px">
+  </v:Table>
+  
+  <v:HorizontalLayout spacing="true">
+    <v:Button caption="create" styleName="small" />
+    <v:Button caption="remove" styleName="small" />
+  </v:HorizontalLayout>
+  
+</ui:UiBinder>
++---
+
+* Connect the menu entry
+
+  Before populating our user list with entries and adding more features to the
+  user administration module, let's connect the menu entry to actually load
+  the module.
+  
+  To achieve this we have to add a listener to our menu tree first. Add the
+  event namespace and a listener to the view declaration, so the {{{../ex/MenuView.xml}MenuView.xml}}
+  finally looks like this:
+  
++---
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:e="urn:org.vaadin.mvp.uibinder.event"
+  xmlns:v="urn:import:com.vaadin.ui"
+  v:sizeFull="" v:spacing="false" v:margin="false">
+  
+  <v:Tree ui:field="menuTree" sizeFull="" e:valueChange="selectMenu">
+  </v:Tree>
+  
+</ui:UiBinder>
++---
+
+  Add two events to the <<<MainEventBus>>> (note that the <<<MenuPresenter>>> does
+  not use a specific event bus definition but the main event bus instead):
+  
++---
+@Event(handlers = { MenuPresenter.class })
+public void selectMenu(ValueChangeEvent event);
+
+@Event(handlers = { MainPresenter.class })
+public void openModule(Class<? extends BasePresenter<?, ? extends EventBus>> presenterClass);
++---
+
+  One may ask: <Why two different events anyway?> First there may be specific handler
+  code in the menu presenter; second, we need to access the selected menu entry to
+  find the presenter class that's going to provide the module content; only the
+  menu presenter has access to the menu view's tree.
+  
+  So next, add the handler code, in {{{../ex/MenuPresenter.java}MenuPresenter.java}}:
+  
++---
+...
+
+public void onSelectMenu(ValueChangeEvent event) {
+  // get the selected menu entry and initiate another event
+  MenuEntry menuEntry = (MenuEntry) this.view.getTree().getValue();
+  this.eventBus.openModule(menuEntry.getPresenterType());
+}
+
+...
++---
+
+  Then also add the handler code for the <<<openModule(...)>>> event in the 
+  {{{../ex/MainPresenter.java}MainPresenter.java}}:
+
++---
+...
+
+public void onOpenModule(Class<? extends BasePresenter<?, ? extends EventBus>> presenter) {
+  // load the menu presenter
+  IPresenterFactory pf = application.getPresenterFactory();
+  this.contentPresenter = pf.createPresenter(presenter);
+  this.view.setContent((Component) this.contentPresenter.getView());
+}
+
+...
++---
+
+  <<Note>>: also for our active module's presenter we keep a reference here. We
+  need to keep a reference to prevent garbage collection of the presenter instance.
+  
+  Let's try to open our module now clicking the menu entry... nothing happens though.
+  In the logs, you'll see that a NullPointerException occurred in the
+  <<<onSelectMenu()>>> handler, because the <<<getValue()>>> of the <<<Tree>>>
+  returned <<<null>>> instead of the selected entry. To fix this we need to set
+  the <<<Tree>>> to <immediate>, the easiest way to do this is to add an attribute
+  <<<immediate="true">>> to the <<<v:Tree>>> declaration in {{{../ex/MenuView.xml}MenuView.xml}}.
+  
+  Selecting the menu entry should finally show up our module's main view:
+  
+[../ex/mvp_ex5.png]
+
+  Next we'll finish up the example, adding functionality to list, create and remove
+  users: {{{./wiring.html}Wiring up actions}}

@@ -1,0 +1,128 @@
+Adding a menu to the MVP Application
+
+  For our menu, we add a separate presenter and a view. However to dispatch 
+  menu events we simply use the <<<MainEventBus>>>.
+  
+  The view is quite simple, actually only a <<<Tree>>> component ({{{../ex/MenuView.xml}MenuView.xml}}):
+
++---
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:v="urn:import:com.vaadin.ui"
+  v:sizeFull="" v:spacing="false" v:margin="false">
+  
+  <v:Tree ui:field="menuTree" sizeFull="">
+  </v:Tree>
+  
+</ui:UiBinder>
++---
+
+  <<Note>>: Both the root component (which is a <<<Panel>>>, see class below) and
+  the tree are set to take up all space in the area with <<<sizeFull="">>>. However,
+  because the root element is declared in the <<<ui>>> namespace the <<<sizeFull>>>-
+  attribute must be prefixed with the target namespace.
+
+  And the corresponding view class and interface ({{{../ex/MenuView.java}MenuView.java}} and 
+  {{{../ex/IMenuView.java}IMenuView.java}}):
+
++---
+public class MenuView extends VerticalLayout implements IMenuView, IUiBindable {
+
+  @UiField
+  Tree menuTree;
+
+  @Override
+  public Tree getTree() {
+    return this.menuTree;
+  }
+  
+}
++---
+
++---
+public interface IMenuView extends Component {
+
+  public abstract Tree getTree();
+
+}
++---
+
+  And finally the presenter class ({{{../ex/MenuPresenter.java}MenuPresenter.java}}):
+  
++---
+@Presenter(view = MenuView.class)
+public class MenuPresenter extends BasePresenter<IMenuView, MainEventBus> {
+}
++---
+
+  Of course we must load the menu presenter during the initialization of the
+  application. This is done in the <<<onStart()>>> event handler in the main
+  presenter, we add the following lines to the end of the method (note that we
+  also need a new member variable <<<menuPresenter>>> to keep a reference to 
+  the menu presenter):
+
++---
+// load the menu presenter
+IPresenterFactory pf = application.getPresenterFactory();
+this.menuPresenter = (MenuPresenter) pf.createPresenter(MenuPresenter.class);
+this.view.setMenu(this.menuPresenter.getView());
++---
+
+  When we restart the application of course it's still missing any entries in 
+  the menu:
+  
+[../ex/mvp_ex3.png]
+
+
+* Adding entries to the menu tree
+
+  First we need a class that represents a menu entry. Each entry
+  should have a caption and should know about a presenter that is responsible
+  to handle the application content. So here's our example {{{../ex/MenuEntry.java}MenuEntry.java}}:
+  
++---
+public class MenuEntry {
+
+  private String caption;
+  private Class<? extends BasePresenter<?, ? extends EventBus>> presenterType;
+  
+  public MenuEntry(String caption, Class<? extends BasePresenter<?, ? extends EventBus>> presenterType) {
+    this.caption = caption;
+    this.presenterType = presenterType;
+  }
+
+  public String getCaption() {
+    return caption;
+  }
+
+  public Class<? extends BasePresenter<?, ? extends EventBus>> getPresenterType() {
+    return presenterType;
+  }
+  
+}
++---
+
+  Suppose we need some kind of user administration. Let's add one entry to the menu tree
+  overriding the <<<MenuPresenter>>>s <<<bind()>>> method as follows:
+  
++---
+@Override
+public void bind() {
+  MenuEntry userAdminEntry = new MenuEntry("User administration", UserAdminPresenter.class);
+  Tree tree = this.view.getTree();
+  // tree.setItemCaptionMode(Tree.ITEM_CAPTION_MODE_ITEM);
+  tree.addItem(userAdminEntry);
+  tree.setChildrenAllowed(userAdminEntry, false);
+}
++---
+
+  The menu entry should be shown up in the application now:
+  
+[../ex/mvp_ex4.png]
+
+  As you certainly noticed we're missing the referenced class <<<UserAdminPresenter.class>>>.
+
+  This presenter class and it's view is shown in the next chapter: 
+  {{{./module.html}Adding a module}}
+
+  

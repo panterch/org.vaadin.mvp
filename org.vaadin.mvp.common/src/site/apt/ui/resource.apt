@@ -1,0 +1,56 @@
+Binding theme resources to components
+
+  Like translations also icons and images are used in almost any user interface.
+  
+  In Vaadin such resources are created (i.e. referenced) using <<<ThemeResource>>>.
+  Adding a theme resource to our user interface involves similar steps like
+  translations:
+  
+  * add a namespace <<<xmlns:r="org.vaadin.mvp.uibinder.resource">>> to the XML
+    declaration
+    
+  * use the <resource>-namespace for attributes that expect a <<<ThemeResource>>>
+  
+  []
+  
+  In the example below, icons are declared on the buttons. Also, the tab component
+  (<<<VerticalLayout>>>) has an icon which is shown - like the caption - on the tab 
+  ({{{../ex/ExampleView5.xml}ExampleView5.xml}}):
+  
++---
+<ui:UiBinder 
+  xmlns:ui="urn:org.vaadin.mvp.uibinder"
+  xmlns:t="urn:org.vaadin.mvp.uibinder.message"
+  xmlns:r="urn:org.vaadin.mvp.uibinder.resource"
+  xmlns:v="urn:import:com.vaadin.ui"
+  xmlns:c="urn:import:com.example.component">
+  
+  <v:TabSheet fullSize="" height="120px" width="400px">
+    
+    <v:VerticalLayout caption="Tab 1" margin="true" spacing="true">
+      
+      
+    </v:VerticalLayout>
+    
+    <v:VerticalLayout caption="Tab 2" r:icon="images/copy.gif" margin="true" spacing="true">
+
+      <v:HorizontalLayout spacing="true">
+
+        <v:Button t:caption="action.save" r:icon="images/save.gif" styleName="small" />
+        <v:Button t:caption="action.cancel" r:icon="images/cancel.gif" styleName="small" />
+
+      </v:HorizontalLayout>
+
+    </v:VerticalLayout>
+  </v:TabSheet>
+  
+</ui:UiBinder>
++---
+
+  The resulting view looks roughly like shown below, given that the images are found in the
+  theme folder of you application:
+
+[../ex/uib_ex5.png]
+
+
+  Next chapter: {{{./eventbinding.html}Event Binding}}
