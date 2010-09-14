@@ -4,20 +4,125 @@
   xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
+  <!--
+  Addon POM may not use parent 
   <parent>
     <artifactId>org.vaadin.mvp</artifactId>
     <groupId>org.vaadin.addons</groupId>
     <version>0.9.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
+  -->
 
+  <groupId>org.vaadin.addons</groupId>
   <artifactId>org.vaadin.mvp.common</artifactId>
   <version>0.9.0</version>
   <name>MVP and UiBinder for Vaadin</name>
+  
+  <!-- start parent definitions -->
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <repositories>
+    <repository>
+      <id>maven</id>
+      <url>http://repo1.maven.org/maven2</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>vaadin-addons</id>
+      <url>http://maven.vaadin.com/vaadin-addons</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>vaadin-addons-plugins</id>
+      <url>http://maven.vaadin.com/vaadin-addons</url>
+    </pluginRepository>
+  </pluginRepositories>
+  
+  <scm>
+    <connection>scm:git:https://github.com/panter/org.vaadin.mvp</connection>
+  </scm>
+  <!-- end parent definitions -->
 
   <properties>
+    <!-- start parent definitions -->
+    <slf4j.version>1.6.1</slf4j.version>
+    <logback.version>0.9.24</logback.version>
+    <vaadin.version>6.4.0</vaadin.version>
+    <beanutils.version>1.8.3</beanutils.version>
+    <spring.version>3.0.2.RELEASE</spring.version>
+    <junit.version>4.8.1</junit.version>
+    <easymock.version>3.0</easymock.version>
+    <!-- end parent definitions -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+  
+  <!-- start parent definitions -->
+  
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin</artifactId>
+        <version>${vaadin.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-beanutils</groupId>
+        <artifactId>commons-beanutils</artifactId>
+        <version>${beanutils.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${spring.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.easymock</groupId>
+        <artifactId>easymock</artifactId>
+        <version>${easymock.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+  <!-- end parent definitions -->
+
 
   <dependencies>
 
@@ -59,10 +164,89 @@
   
   <build>
     <plugins>
+      <!-- start parent definitions -->
+      <plugin>
+        <inherited>true</inherited>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <inherited>true</inherited>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+            <include>**/*TestCase.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.8</version>
+      </plugin>
+      
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Vaadin-Package-Version>1</Vaadin-Package-Version>
+              <Implementation-Title>${project.name}</Implementation-Title>
+              <Implementation-Version>${project.version}</Implementation-Version>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+    
+
+      <!-- attach source / javadoc -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+          <templateFile>${basedir}/src/site/template/maven-site.vm</templateFile>
+        </configuration>
+      </plugin>
+      <!-- end parent definitions -->
+    
       <plugin>
         <inherited>true</inherited>
         <groupId>org.vaadin.addons.maven.plugins</groupId>
         <artifactId>maven-vaadin-plugin</artifactId>
+        <version>0.1.0</version>
         <executions>
           <execution>
             <phase>install</phase>
