@@ -30,11 +30,11 @@ public class ComponentHandlerTest {
     assertEquals("wrong setter selected", VerticalLayout.class.getMethod("setHeight", String.class), m);
   }
 
-  @Test
-  public void testFindApplicableSetterMethodFloatArg() throws SecurityException, NoSuchMethodException {
-    Method m = instance.findApplicableSetterMethod(bean, "height", 67.0f);
-    assertEquals("wrong setter selected", VerticalLayout.class.getMethod("setHeight", float.class), m);
-  }
+//  @Test
+//  public void testFindApplicableSetterMethodFloatArg() throws SecurityException, NoSuchMethodException {
+//    Method m = instance.findApplicableSetterMethod(bean, "height", 67.0f);
+//    assertEquals("wrong setter selected", VerticalLayout.class.getMethod("setHeight", float.class), m);
+//  }
 
   @Ignore("Currently not supported, introduce expressions, e.g. MVEL to support this.")
   @Test

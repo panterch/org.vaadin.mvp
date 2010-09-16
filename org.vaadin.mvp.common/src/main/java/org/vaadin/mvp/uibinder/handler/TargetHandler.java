@@ -11,7 +11,7 @@ public interface TargetHandler {
 
   public void handleElementOpen(String uri, String name) throws UiBinderException;
   
-  public void handleElementClose();
+  public void handleElementClose() throws UiBinderException;
   
   public void handleAttribute(String name, Object value) throws UiConstraintException;
   

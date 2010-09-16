@@ -1,5 +1,6 @@
 package org.vaadin.mvp.uibinder.handler;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -34,10 +35,10 @@ import com.vaadin.ui.Panel;
  * <p>
  * The component handler then uses the actual namespace in the form
  * <code>urn:import:package-name</code> (e.g.
- * <code>urn:import:org.vaadin.mvp.component</code>) as the package
- * information, the elements local name is expected to be a class in the
- * package. On start of an element, the component handler tries to create an
- * instance of the class' fully qualified name (package + name).
+ * <code>urn:import:org.vaadin.mvp.component</code>) as the package information,
+ * the elements local name is expected to be a class in the package. On start of
+ * an element, the component handler tries to create an instance of the class'
+ * fully qualified name (package + name).
  * </p>
  * 
  * @author tam
@@ -57,7 +58,7 @@ public class ComponentHandler implements TargetHandler {
    * nested components)
    */
   private UiBinder uiBinder;
-  
+
   /**
    * The associated event binder (required to bind sub views).
    */
@@ -74,6 +75,9 @@ public class ComponentHandler implements TargetHandler {
   /** The current component being built. */
   Component current = null;
 
+  /** The method to add the current component to the parent. Can be null. */
+  private Method currentMethod;
+
   /**
    * Constructor.
    * 
@@ -86,7 +90,7 @@ public class ComponentHandler implements TargetHandler {
     this.locale = locale;
     current = view;
   }
-  
+
   public IEventBinder getEventBinder() {
     return eventBinder;
   }
@@ -94,8 +98,6 @@ public class ComponentHandler implements TargetHandler {
   public void setEventBinder(IEventBinder eventBinder) {
     this.eventBinder = eventBinder;
   }
-
-
 
   @Override
   public String getTargetNamespace() {
@@ -177,7 +179,7 @@ public class ComponentHandler implements TargetHandler {
       } else {
         throw new UiConstraintException("Unsupported namespace URI scheme: " + scheme + " (URI = " + uri + ")");
       }
-      if(pkg.startsWith("import:")) {
+      if (pkg.startsWith("import:")) {
         pkg = pkg.substring("import:".length());
       }
       packages.put(uri, pkg);
@@ -188,25 +190,44 @@ public class ComponentHandler implements TargetHandler {
   }
 
   @Override
-  public void handleElementClose() {
+  public void handleElementClose() throws UiBinderException {
     Component inner = current;
     current = components.pop(); // should always be one on the stack
 
-    logger.debug("Adding element {} to {}", inner, current);
+    logger.debug("Adding element {} to {}", inner.getClass().getName(), current.getClass().getName());
 
     // add the inner component to the current
-    if (current instanceof Panel && inner instanceof ComponentContainer) {
-      // set content
-      ComponentContainer panelContent = ((Panel) current).getContent();
-      if (panelContent != null) {
-        logger.warn("Panel content is already set, content is overwritten with new component");
+    if (currentMethod != null) {
+      try {
+        if (inner instanceof Component) {
+          currentMethod.invoke(current, inner);
+        }
+      } catch (IllegalArgumentException e) {
+        throw new UiBinderException("IllegalArgumentException: Cannot add component " + inner.getClass().getName() + " with method "
+            + this.currentMethod.getName() + "(" + currentMethod.getParameterTypes()[0].getName() + ")", e);
+      } catch (IllegalAccessException e) {
+        throw new UiBinderException("IllegalAccessException: Cannot add component " + inner.getClass().getName() + " with method "
+            + this.currentMethod.getName() + "(" + currentMethod.getParameterTypes()[0].getName() + ")", e);
+      } catch (InvocationTargetException e) {
+        throw new UiBinderException("InvocationTargetException: Cannot ad component " + inner.getClass().getName() + " with method "
+            + this.currentMethod.getName() + "(" + currentMethod.getParameterTypes()[0].getName() + ")", e);
       }
-      logger.debug("Current {} is a PANEL, setting content: {}", current.getClass().getName(), inner.getClass().getName());
-      ((Panel) current).setContent((ComponentContainer) inner);
-    } else if (current instanceof ComponentContainer) {
-      // add the component
-      logger.debug("Current {} is a container, adding new comp: {}", current.getClass().getName(), inner.getClass().getName());
-      ((ComponentContainer) current).addComponent(inner);
+      logger.debug("Add current {} with Method {}", current.getClass().getName(), this.currentMethod.getName());
+      currentMethod = null;
+    } else {
+      if (current instanceof Panel && inner instanceof ComponentContainer) {
+        // set content
+        ComponentContainer panelContent = ((Panel) current).getContent();
+        if (panelContent != null) {
+          logger.warn("Panel content is already set, content is overwritten with new component");
+        }
+        logger.debug("Current {} is a PANEL, setting content: {}", current.getClass().getName(), inner.getClass().getName());
+        ((Panel) current).setContent((ComponentContainer) inner);
+      } else if (current instanceof ComponentContainer) {
+        // add the component
+        logger.debug("Current {} is a container, adding new comp: {}", current.getClass().getName(), inner.getClass().getName());
+        ((ComponentContainer) current).addComponent(inner);
+      }
     }
     logger.debug("Element closed, current element now is: {}", current.getClass().getName());
   }
@@ -291,5 +312,20 @@ public class ComponentHandler implements TargetHandler {
       }
     }
     return null;
+  }
+
+  /**
+   * Set the method to add the current component to the parent. The standard
+   * will be used when not set and the method will be cleared after
+   * {@link #handleElementClose()}.
+   * 
+   * @param currentMethod
+   */
+  public void setCurrentMethod(Method currentMethod) {
+    this.currentMethod = currentMethod;
+  }
+
+  protected Method getCurrentMethod() {
+    return currentMethod;
   }
 }

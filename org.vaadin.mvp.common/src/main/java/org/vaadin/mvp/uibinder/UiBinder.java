@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -17,6 +16,7 @@ import org.vaadin.mvp.uibinder.handler.BindingParserHandler;
 import org.vaadin.mvp.uibinder.handler.ComponentHandler;
 import org.vaadin.mvp.uibinder.handler.EventHandler;
 import org.vaadin.mvp.uibinder.handler.I18nHandler;
+import org.vaadin.mvp.uibinder.handler.MethodHandler;
 import org.vaadin.mvp.uibinder.handler.ResourceHandler;
 import org.vaadin.mvp.uibinder.handler.UiHandler;
 import org.vaadin.mvp.uibinder.resource.EmptyUiMessageSource;
@@ -199,7 +199,9 @@ public class UiBinder {
     EventHandler eh = new EventHandler(ch, eventBinder);
     ch.setEventBinder(eventBinder);
 
-    BindingParserHandler dh = new BindingParserHandler(ch, lh, ui, rh, eh);
+    MethodHandler mh = new MethodHandler(ch);
+    
+    BindingParserHandler dh = new BindingParserHandler(ch, lh, ui, rh, eh, mh);
     try {
       parser.parse(resource, dh);
     } catch (Exception e) {

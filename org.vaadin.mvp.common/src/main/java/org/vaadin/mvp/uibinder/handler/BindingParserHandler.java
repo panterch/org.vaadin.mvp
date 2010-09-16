@@ -63,7 +63,11 @@ public class BindingParserHandler extends DefaultHandler {
   @Override
   public void endElement(String uri, String localName, String qName) throws SAXException {
     logger.debug("End element: {}", qName);
-    getHandler(uri).handleElementClose();
+    try {
+      getHandler(uri).handleElementClose();
+    } catch (UiBinderException e) {
+      throw new SAXException(e);
+    }
   }
 
   private TargetHandler getHandler(String uri) {
