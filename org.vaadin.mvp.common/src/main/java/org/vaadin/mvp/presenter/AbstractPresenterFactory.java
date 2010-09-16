@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.mvp.eventbus.EventBus;
 import org.vaadin.mvp.eventbus.EventBusManager;
+import org.vaadin.mvp.uibinder.IUiMessageSource;
+
+import com.vaadin.Application;
 
 
 /**
@@ -32,6 +35,10 @@ public abstract class AbstractPresenterFactory implements IPresenterFactory {
   
   /** The current locale */
   protected Locale locale = Locale.getDefault();
+  
+  /** Optional reference to the Application and MessageSource */
+  protected Application application;
+  protected IUiMessageSource messageSource;    
   
   public AbstractPresenterFactory() {
   }
@@ -87,6 +94,8 @@ public abstract class AbstractPresenterFactory implements IPresenterFactory {
     if(presenter instanceof IFactoryAwarePresenter) {
       ((IFactoryAwarePresenter) presenter).setPresenterFactory(this);
     }
+    presenter.setApplication(application);
+    presenter.setMessageSource(messageSource);    
     return presenter;
   }
 
@@ -116,6 +125,14 @@ public abstract class AbstractPresenterFactory implements IPresenterFactory {
       eb = this.eventBusManager.register(eventBusType, presenter);
     }
     return eb;
+  }
+
+  public void setApplication(Application application) {
+    this.application = application;
+  }
+
+  public void setMessageSource(IUiMessageSource messageSource) {
+    this.messageSource = messageSource;
   }
 
 }
