@@ -209,6 +209,11 @@ public class UiBinder {
     }
 
     bindComponents(view, ui);
+    
+    if (view instanceof IUiInitializable) {
+      ((IUiInitializable) view).init();
+    }
+    
     return view;
   }
 

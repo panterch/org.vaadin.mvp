@@ -172,6 +172,13 @@ public class UiBinderTest {
     assertEquals("de only message wrong", "Dieser Text steht nur in deutsch", view.labelTwo.getCaption());
   }
 
+  @Test
+  public void testBindSimpleComponentsInitialized() throws UiBinderException {
+    UiBinderViewInit root = instance.bind(UiBinderViewInit.class, new Locale("en"), null);
+    assertNotNull("component is null", root);
+    assertTrue("component is not initialzed", root.initialized);
+  }  
+  
   /**
    * Test that a concrete view works as well.
    * 
