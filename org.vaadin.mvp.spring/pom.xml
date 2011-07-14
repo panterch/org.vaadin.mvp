@@ -5,13 +5,13 @@
   <parent>
     <artifactId>org.vaadin.mvp</artifactId>
     <groupId>org.vaadin.addons</groupId>
-    <version>0.9.1</version>
+    <version>0.9.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>org.vaadin.addons</groupId>
   <artifactId>org.vaadin.mvp.spring</artifactId>
-  <version>0.9.1</version>
+  <version>0.9.2-SNAPSHOT</version>
   <name>MVP and UiBinder Spring Integration</name>
   <description><![CDATA[MVP for Vaadin: Spring Framework bindings]]></description>
   <dependencies>
