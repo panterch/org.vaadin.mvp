@@ -150,9 +150,10 @@
         <configuration>
           <pushChanges>false</pushChanges>
           <localCheckout>true</localCheckout>
+          <!-- Currently site deployment is skipped. -->
+          <goals>deploy</goals>
         </configuration>
       </plugin>
-      
     </plugins>
   </build>
 
