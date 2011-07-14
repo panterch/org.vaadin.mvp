@@ -6,11 +6,11 @@
   <parent>
     <artifactId>org.vaadin.mvp</artifactId>
     <groupId>org.vaadin.addons</groupId>
-    <version>0.9.0</version>
+    <version>0.9.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.vaadin.mvp.example</artifactId>
-  <version>0.9.0</version>
+  <version>0.9.1-SNAPSHOT</version>
   <name>MVP for Vaadin Example</name>
   <packaging>war</packaging>
 

@@ -1,13 +1,12 @@
 package org.vaadin.mvp.uibinder.resource;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.vaadin.mvp.uibinder.resource.ResourceBundleUiMessageSource;
 
 public class ResourceBundleUiMessageSourceTest {
 

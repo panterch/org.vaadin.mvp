@@ -5,7 +5,7 @@
 
   <groupId>org.vaadin.addons</groupId>
   <artifactId>org.vaadin.mvp</artifactId>
-  <version>0.9.0</version>
+  <version>0.9.1-SNAPSHOT</version>
   <name>MVP for Vaadin</name>
   <packaging>pom</packaging>
 
@@ -16,33 +16,27 @@
     </license>
   </licenses>
 
-  <repositories>
-    <repository>
-      <id>maven</id>
-      <url>http://repo1.maven.org/maven2</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>vaadin-addons</id>
-      <url>http://maven.vaadin.com/vaadin-addons</url>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>vaadin-addons-plugins</id>
-      <url>http://maven.vaadin.com/vaadin-addons</url>
-    </pluginRepository>
-  </pluginRepositories>
-  
   <scm>
     <connection>scm:git:https://github.com/panter/org.vaadin.mvp</connection>
   </scm>
+
+  <distributionManagement>
+    <repository>
+      <id>oss-releases</id>
+      <name>OSS Panter Releases Repository</name>
+      <url>https://java.panter.ch/nexus/content/repositories/oss-releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>oss-snapshots</id>
+      <name>OSS Panter Snapshots Repository</name>
+      <url>https://java.panter.ch/nexus/content/repositories/oss-snapshots/</url>
+    </snapshotRepository>
+    <site>
+      <id>oss-sites</id>
+      <name>OSS Panter Maven Sites</name>
+      <url>scpexe://nexus@java.panter.ch/var/www/oss-sites/org.vaadin.mvp</url>
+    </site>
+  </distributionManagement>
 
   <modules>
     <module>org.vaadin.mvp.common</module>
@@ -140,33 +134,6 @@
         <version>2.8</version>
       </plugin>
 
-      <!-- attach source / javadoc -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
@@ -177,19 +144,15 @@
       </plugin>
 
       <plugin>
-        <inherited>true</inherited>
-        <groupId>org.vaadin.addons.maven.plugins</groupId>
-        <artifactId>maven-vaadin-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>install</phase>
-            <goals>
-              <goal>addon</goal>
-            </goals>
-          </execution>
-        </executions>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+          <pushChanges>false</pushChanges>
+          <localCheckout>true</localCheckout>
+        </configuration>
       </plugin>
-
+      
     </plugins>
   </build>
 
