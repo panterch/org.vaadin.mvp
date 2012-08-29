@@ -67,13 +67,13 @@ public class ComponentHandler implements TargetHandler {
   private Locale locale;
 
   /** Component stack */
-  Stack<Component> components = new Stack<Component>();
+  private Stack<Component> components = new Stack<Component>();
 
   /** Map of namespaci uri to package */
-  Map<String, String> packages = new HashMap<String, String>();
+  private Map<String, String> packages = new HashMap<String, String>();
 
   /** The current component being built. */
-  Component current = null;
+  private Component current = null;
 
   /** The method to add the current component to the parent. Can be null. */
   private Method currentMethod;
