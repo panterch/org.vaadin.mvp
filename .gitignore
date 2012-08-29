@@ -4,6 +4,15 @@
 # exclude patterns (uncomment them if you want to use them):
 # *.[oa]
 # *~
+.gradle/
+atlassian-ide-plugin.xml
+org.vaadin.mvp.common/org.vaadin.mvp.common.iml
+org.vaadin.mvp.example/org.vaadin.mvp.example.iml
+org.vaadin.mvp.iml
+org.vaadin.mvp.ipr
+org.vaadin.mvp.iws
+org.vaadin.mvp.spring/org.vaadin.mvp.spring.iml
+
 config/database.yml
 coverage/
 db/*.sqlite3
