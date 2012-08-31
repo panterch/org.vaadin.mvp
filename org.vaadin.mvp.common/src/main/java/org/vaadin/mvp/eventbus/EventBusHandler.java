@@ -18,18 +18,20 @@ class EventBusHandler implements InvocationHandler {
   /** Logger */
   private static final Logger logger = LoggerFactory.getLogger(EventBusHandler.class);
 
-  private EventBusManager eventManager;
-
   private EventBus parent;
 
-  private EventReceiverRegistry handlerRegistry;
+  private IEventReceiverRegistry handlerRegistry;
 
   private String busName;
 
-  public EventBusHandler(EventBusManager em, EventReceiverRegistry hr, String name) {
-    this.eventManager = em;
+  public EventBusHandler(IEventReceiverRegistry hr, String name) {
+    this(hr,name,null);
+  }
+
+  public EventBusHandler(IEventReceiverRegistry hr, String name, EventBus parent) {
     this.handlerRegistry = hr;
     this.busName = name;
+    this.parent = parent;
   }
 
   /**
@@ -45,6 +47,12 @@ class EventBusHandler implements InvocationHandler {
     logger.info("Event received: {}", method.getName());
     Event eventDef = method.getAnnotation(Event.class);
     logger.info("Event annotation: {}", eventDef);
+
+    boolean localHandlerMethodFound = false;
+
+    String eventName = method.getName();
+    String eventHandlerName = "on" + eventName.substring(0, 1).toUpperCase() + eventName.substring(1);
+
     Class<?>[] handlerTypes = eventDef.handlers();
     for (Class<?> handlerType : handlerTypes) {
       Object handler = handlerRegistry.lookupReceiver(handlerType);
@@ -55,19 +63,16 @@ class EventBusHandler implements InvocationHandler {
 
       // invoke handler; the actual method is the event name prefixed with
       // "on..."
-      String eventName = method.getName();
-      Method handlerMethod = null;
-      String eventHandlerName = null;
-      try {
-        eventHandlerName = "on" + eventName.substring(0, 1).toUpperCase() + eventName.substring(1);
-        handlerMethod = handler.getClass().getMethod(eventHandlerName, method.getParameterTypes());
-      } catch (Throwable t) {
-        Object[] msgArgs = { handler.getClass().getName(), eventName, eventHandlerName };
-        logger.warn("{} defined as a receiver for event {} but no method {}" +
-            " could be found with matching arguments", msgArgs);
+
+      Method handlerMethod = lookupHandlerMethod(method, eventName, eventHandlerName, handler);
+
+      if (handlerMethod == null) {
+        continue;
       }
+
       try {
         if (handlerMethod != null) {
+          localHandlerMethodFound = true;
           handlerMethod.invoke(handler, args);
         }
       } catch (Throwable t) {
@@ -78,18 +83,34 @@ class EventBusHandler implements InvocationHandler {
         // mainBus.error(t);
       }
     }
-    /* forwarding to parent disabled / there's no possibility to declare the parent */
-    /*
-    if (eventDef.forwardToParent() && parent != null) {
-      try {
-        Method m = parent.getClass().getMethod(method.getName(), method.getParameterTypes());
-        m.invoke(parent, args);
-      } catch (Throwable t) {
-        logger.error("Failed to invoke parent event bus", t);
-      }
+
+    final boolean fallbackOnParent = parent != null;
+
+    if (!localHandlerMethodFound && fallbackOnParent) {
+      delegateToParent(method, args);
     }
-    */
+
     return null;
+  }
+
+  private Method lookupHandlerMethod(Method method, String eventName, String eventHandlerName, Object handler) {
+    try {
+      return handler.getClass().getMethod(eventHandlerName, method.getParameterTypes());
+    } catch (Throwable t) {
+      Object[] msgArgs = { handler.getClass().getName(), eventName, eventHandlerName };
+      logger.warn("{} defined as a receiver for event {} but no method {}" +
+          " could be found with matching arguments", msgArgs);
+    }
+    return null;
+  }
+
+  private void delegateToParent(Method method, Object[] args) {
+    try {
+      Method m = parent.getClass().getMethod(method.getName(), method.getParameterTypes());
+      m.invoke(parent, args);
+    } catch (Throwable t) {
+      logger.error("Failed to invoke parent event bus", t);
+    }
   }
 
 }

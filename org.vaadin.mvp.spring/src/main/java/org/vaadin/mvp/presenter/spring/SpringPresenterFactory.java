@@ -42,7 +42,7 @@ public class SpringPresenterFactory extends AbstractPresenterFactory implements 
   }
 
   @SuppressWarnings("unchecked")
-  public IPresenter<?, ? extends EventBus> create(Object name) {
+  public IPresenter<?, ? extends EventBus> create(Object name,EventBus parentEventBus) {
     if (!(name instanceof String)) {
       throw new IllegalArgumentException("Argument is expected to be a bean name (string)");
     }
@@ -56,7 +56,7 @@ public class SpringPresenterFactory extends AbstractPresenterFactory implements 
         throw new IllegalArgumentException("Missing @Presenter annotation on bean '" + beanName + "'");
       }
 
-      EventBus eventBus = createEventBus((Class<IPresenter>) p.getClass(), p);
+      EventBus eventBus = createEventBus((Class<IPresenter>) p.getClass(), p,parentEventBus);
       p.setEventBus(eventBus);
 
       try {
