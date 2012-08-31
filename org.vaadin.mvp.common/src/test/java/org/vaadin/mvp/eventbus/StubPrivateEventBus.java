@@ -1,5 +1,6 @@
 package org.vaadin.mvp.eventbus;
 
+import org.vaadin.mvp.eventbus.annotation.Event;
 import org.vaadin.mvp.eventbus.annotation.PrivateEventBus;
 
 /**
@@ -11,5 +12,10 @@ import org.vaadin.mvp.eventbus.annotation.PrivateEventBus;
 @PrivateEventBus
 public interface StubPrivateEventBus extends EventBus {
 
+  @Event
+  public void selectMenuEntry(EventArgument dto);
+
+  @Event
+  public void niceEvent();
 
 }

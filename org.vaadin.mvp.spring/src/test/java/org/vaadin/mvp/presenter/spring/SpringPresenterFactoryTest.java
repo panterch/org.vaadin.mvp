@@ -36,7 +36,7 @@ public class SpringPresenterFactoryTest {
 
   @Test
   public void testCreate() {
-    IPresenter<?, ? extends EventBus> presenter = instance.create("spring");
+    IPresenter<?, ? extends EventBus> presenter = instance.createPresenter("spring");
     assertNotNull("created presenter is null", presenter);
     assertNotNull("presenters view is null", presenter.getView());
     assertTrue("presenters bind() method has not been called", ((SpringPresenter)presenter).bound);

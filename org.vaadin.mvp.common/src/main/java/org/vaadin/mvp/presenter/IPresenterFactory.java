@@ -22,7 +22,19 @@ public interface IPresenterFactory {
    * @return new instance of the presenter
    */
   public abstract IPresenter<?, ? extends EventBus> createPresenter(Object arg);
-  
+
+  /**
+   * Create a new instance of a presenter with it's view and event bus setup, if a parentEventBus is provided it will
+   * be used as parent bus this will enable a fallback of the event not handled directly from the newly created event bus
+   *
+   * @param arg
+   *          identifier of the presenter to create (e.g. a name, class, etc.)
+   * @param parentEventBus
+   *          the bus that will be used as parent
+   * @return new instance of the presenter
+   */
+  public abstract IPresenter<?, ? extends EventBus> createPresenter(Object arg, EventBus parentEventBus);
+
   /**
    * Returns the view factory.
    * 

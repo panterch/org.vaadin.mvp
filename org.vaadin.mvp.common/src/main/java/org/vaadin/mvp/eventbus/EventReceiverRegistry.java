@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author tam
  */
-public class EventReceiverRegistry {
+public class EventReceiverRegistry implements IEventReceiverRegistry {
 
   
   /** Logger */
@@ -30,11 +30,7 @@ public class EventReceiverRegistry {
    */
   private Map<Class<?>, WeakReference<?>> receivers = new HashMap<Class<?>, WeakReference<?>>();
 
-  /**
-   * Add a receiver to the registry.
-   * 
-   * @param receiver Instance of the event receiver.
-   */
+  @Override
   public void addReceiver(Object receiver) {
     // clear collected receivers from our map first
     // create a "copy" of the maps keyset to allow modification while looping
@@ -49,16 +45,7 @@ public class EventReceiverRegistry {
     receivers.put(receiver.getClass(), new WeakReference<Object>(receiver));
   }
 
-  /**
-   * Lookup a receiver by its type.
-   * 
-   * @param <T>
-   *          Receiver type
-   * @param receiverType
-   *          Receiver type class
-   * @return the receiver instance if present in the registry or
-   *         <code>null</code>
-   */
+  @Override
   public <T> T lookupReceiver(Class<T> receiverType) {
     if (receivers.containsKey(receiverType)) {
       WeakReference<T> reference = (WeakReference<T>) receivers.get(receiverType);
