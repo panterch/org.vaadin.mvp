@@ -1,5 +1,6 @@
 package com.example.menu;
 
+import com.example.privatebus.manager.ManagerPresenter;
 import org.vaadin.mvp.presenter.BasePresenter;
 import org.vaadin.mvp.presenter.annotation.Presenter;
 
@@ -15,15 +16,21 @@ public class MenuPresenter extends BasePresenter<IMenuView, MainEventBus> {
 
   @Override
   public void bind() {
-    // create an entry
+    // create and add user admin entry
     MenuEntry userAdminEntry = new MenuEntry("User administration", UserAdminPresenter.class);
-    
-    // add the entry to the tree
+    addItemToTree(userAdminEntry);
+
+    // create and add private presenter entry
+    MenuEntry privatePresenterEntry = new MenuEntry("Private presenter", ManagerPresenter.class);
+    addItemToTree(privatePresenterEntry);
+  }
+
+  private void addItemToTree(MenuEntry userAdminEntry) {
     Tree tree = this.view.getTree();
     tree.addItem(userAdminEntry);
     tree.setChildrenAllowed(userAdminEntry, false);
   }
-  
+
   public void onSelectMenu(ValueChangeEvent event) {
     // get the selected menu entry and initiate another event
     MenuEntry menuEntry = (MenuEntry) this.view.getTree().getValue();

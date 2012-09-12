@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:UiBinder
+        xmlns:ui="urn:org.vaadin.mvp.uibinder"
+        xmlns:e="urn:org.vaadin.mvp.uibinder.event"
+        xmlns:v="urn:import:com.vaadin.ui"
+        v:sizeFull="" v:spacing="true" v:margin="true">
+
+    <v:Label styleName="h2" caption="Greeting message" />
+
+    <v:Label ui:field="messageLabel" caption="" />
+
+</ui:UiBinder>

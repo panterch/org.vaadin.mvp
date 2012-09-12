@@ -4,10 +4,11 @@ import org.vaadin.mvp.eventbus.annotation.Event;
 import org.vaadin.mvp.eventbus.annotation.PrivateEventBus;
 
 /**
- * Created by IntelliJ IDEA.
- * User: apalumbo
- * Date: 8/30/12
- * Time: 5:18 PM
+ * An event bus that has been marked private using the @PrivateEventBus annotation, is used
+ * for test purposes
+ *
+ * @author: apalumbo
+ *
  */
 @PrivateEventBus
 public interface StubPrivateEventBus extends EventBus {

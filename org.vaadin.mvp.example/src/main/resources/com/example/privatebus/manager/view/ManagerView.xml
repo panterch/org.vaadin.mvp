@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:UiBinder
+        xmlns:ui="urn:org.vaadin.mvp.uibinder"
+        xmlns:e="urn:org.vaadin.mvp.uibinder.event"
+        xmlns:v="urn:import:com.vaadin.ui"
+        v:sizeFull="" v:spacing="true" v:margin="true">
+
+    <v:Label styleName="h2" caption="Private event bus example" />
+
+    <v:Label caption="Choose which presenter you want to notify" />
+
+    <v:HorizontalLayout spacing="true">
+        <v:Button caption="Greeting First Presenter" styleName="small" e:click="greetingFirst" />
+        <v:Button caption="Greeting Second Presenter" styleName="small" e:click="greetingSecond" />
+    </v:HorizontalLayout>
+
+    <v:VerticalLayout spacing="true">
+        <v:Label caption="First Presenter" />
+        <v:Panel ui:field="firstPresenterContainer"/>
+        <v:Label caption="Second Presenter" />
+        <v:Panel ui:field="secondPresenterContainer"/>
+    </v:VerticalLayout>
+
+</ui:UiBinder>

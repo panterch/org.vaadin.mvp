@@ -24,6 +24,7 @@ public class ExampleApp extends Application {
   public void init() {
     // create an instance of a default presenter factory
     this.presenterFactory = new PresenterFactory(ebm, getLocale());
+    this.presenterFactory.setApplication(this);
     
     // request an instance of MainPresenter
     mainPresenter = this.presenterFactory.createPresenter(MainPresenter.class);

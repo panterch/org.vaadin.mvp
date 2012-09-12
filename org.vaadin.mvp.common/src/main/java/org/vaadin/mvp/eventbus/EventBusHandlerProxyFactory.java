@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: apalumbo
- * Date: 8/30/12
- * Time: 6:55 PM
+ * This class is responsible for the creation of the handler of the event bus. Java dynamic proxies will be used
+ * delegating the execution to a EventBusHandler. The dynamic proxy created and returned will
+ * implement the main event bus interface and , if provided, also the parent event bus interface. This is useful for the
+ * fallback dispatching (forward to parent)
+ *
+ * @author: apalumbo
  */
 public class EventBusHandlerProxyFactory {
 

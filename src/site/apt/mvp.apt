@@ -144,7 +144,21 @@ public interface MainEventBus extends EventBus {
 
   Our <<<MainEventBus>>> interface must extend <<<EventBus>>>. For instance we
   have one single event named <<<start()>>> taking the application as parameter.
-  
+
+  Be aware that the bus will be global so it could handle only one presenter instance of the same type.
+  If you need to have more instances of the same presenter you should consider the usage of a private event bus.
+  In this way each presenter will have its own instance of bus.
+
++---
+@PrivateEventBus
+public interface AnotherEventBus extends EventBus {
+
+  @Event(handlers = { AnotherPresenter.class })
+  public void sayHello(String message);
+
+}
++---
+
   To run our example application for the first time, we only need a few more
   lines of code.
   

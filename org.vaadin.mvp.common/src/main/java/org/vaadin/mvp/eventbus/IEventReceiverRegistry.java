@@ -1,10 +1,10 @@
 package org.vaadin.mvp.eventbus;
 
 /**
- * Created by IntelliJ IDEA.
- * User: apalumbo
- * Date: 8/30/12
- * Time: 6:30 PM
+ * Classes that implements the event receiver registry interface will handle the registration and the lookup
+ * of event receivers
+ *
+ * @author: apalumbo
  */
 public interface IEventReceiverRegistry {
   /**

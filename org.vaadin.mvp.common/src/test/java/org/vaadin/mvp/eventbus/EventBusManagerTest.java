@@ -5,10 +5,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Created by IntelliJ IDEA.
- * User: apalumbo
- * Date: 8/30/12
- * Time: 5:13 PM
+ * EventBusManager test class
+ *
+ * @author : apalumbo
+ *
  */
 public class EventBusManagerTest {
 
