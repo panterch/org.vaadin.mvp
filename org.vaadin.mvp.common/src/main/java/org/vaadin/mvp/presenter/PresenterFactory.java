@@ -37,7 +37,7 @@ public class PresenterFactory extends AbstractPresenterFactory {
    * @param arg
    * @return
    */
-  protected IPresenter<?, ? extends EventBus> create(Object arg) {
+  protected IPresenter<?, ? extends EventBus> create(Object arg,EventBus parentEventBus) {
     if (!(arg instanceof Class)) {
       throw new IllegalArgumentException("Object arg must be a class of type IPresenter.");
     }
@@ -53,7 +53,7 @@ public class PresenterFactory extends AbstractPresenterFactory {
       }
 
       EventBus bus = null;
-      bus = createEventBus(presenterClass, presenter);
+      bus = createEventBus(presenterClass, presenter,parentEventBus);
       presenter.setEventBus(bus);
       
       Object view = viewFactory.createView(eventBusManager, presenter, def.view(), locale);

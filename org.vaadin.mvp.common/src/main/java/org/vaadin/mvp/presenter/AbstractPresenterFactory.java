@@ -87,7 +87,12 @@ public abstract class AbstractPresenterFactory implements IPresenterFactory {
 
   @Override
   public IPresenter<?, ? extends EventBus> createPresenter(Object arg){
-    IPresenter<?, ? extends EventBus> presenter = create(arg);
+    return this.createPresenter(arg,null);
+  }
+
+  @Override
+  public IPresenter<?, ? extends EventBus> createPresenter(Object arg,EventBus parentEventBus){
+    IPresenter<?, ? extends EventBus> presenter = create(arg,parentEventBus);
     if(customizer != null) {
       customizer.customize(presenter);
     }
@@ -95,11 +100,11 @@ public abstract class AbstractPresenterFactory implements IPresenterFactory {
       ((IFactoryAwarePresenter) presenter).setPresenterFactory(this);
     }
     presenter.setApplication(application);
-    presenter.setMessageSource(messageSource);    
+    presenter.setMessageSource(messageSource);
     return presenter;
   }
 
-  protected abstract IPresenter<?, ? extends EventBus> create(Object arg);
+  protected abstract IPresenter<?, ? extends EventBus> create(Object arg,EventBus parentEventBus);
   
   /**
    * Utility method to create/register an event bus.
@@ -108,7 +113,7 @@ public abstract class AbstractPresenterFactory implements IPresenterFactory {
    * @param presenter
    * @return
    */
-  protected EventBus createEventBus(Class<IPresenter> presenterClass, IPresenter presenter) {
+  protected EventBus createEventBus(Class<IPresenter> presenterClass, IPresenter presenter, EventBus parentEventBus) {
     Type gsc = presenterClass.getGenericSuperclass();
     logger.debug("Generic super class: {}", gsc);
     ParameterizedType pt = (ParameterizedType) gsc;
@@ -122,7 +127,7 @@ public abstract class AbstractPresenterFactory implements IPresenterFactory {
     if (EventBus.class.isAssignableFrom((Class<?>) ebt)) {
       Class<? extends EventBus> eventBusType = (Class<? extends EventBus>) ebt;
       logger.debug("EventBus class: {}", eventBusType.getName());
-      eb = this.eventBusManager.register(eventBusType, presenter);
+      eb = this.eventBusManager.register(eventBusType, presenter,parentEventBus);
     }
     return eb;
   }

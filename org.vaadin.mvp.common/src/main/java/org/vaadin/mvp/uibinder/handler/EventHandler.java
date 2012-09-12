@@ -66,7 +66,7 @@ public class EventHandler implements TargetHandler {
    */
   @Override
   public void handleAttribute(String name, Object value) throws UiConstraintException {
-    Component comp = ch.current;
+    Component comp = ch.getCurrent();
     try {
       eventBinder.bindListener(comp, name, value);
     } catch (EventBindingException e) {

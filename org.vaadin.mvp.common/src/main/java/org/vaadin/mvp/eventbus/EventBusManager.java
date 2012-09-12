@@ -1,5 +1,7 @@
 package org.vaadin.mvp.eventbus;
 
+import org.vaadin.mvp.eventbus.annotation.PrivateEventBus;
+
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +18,7 @@ public class EventBusManager {
 
   private Map<Class<? extends EventBus>, EventBus> eventBusses;
 
-  private EventReceiverRegistry handlerRegistry = new EventReceiverRegistry();
+  private IEventReceiverRegistry handlerRegistry = new EventReceiverRegistry();
 
   public EventBusManager() {
     // busHandlers = new HashMap<EventBus, EventBusHandler>();
@@ -36,15 +38,38 @@ public class EventBusManager {
    * @return event bus instance
    */
   public <T extends EventBus> T register(Class<T> busType, Object subscriber) {
-    if (!eventBusses.containsKey(busType)) {
-      eventBusses.put(busType, create(busType));
-    }
-    this.handlerRegistry.addReceiver(subscriber);
-    EventBus eventBus = eventBusses.get(busType);
-    return (T) eventBus;
+    return this.register(busType,subscriber,null);
   }
-  
-  /**
+
+  public <T extends EventBus> T register(Class<T> busType, Object subscriber,EventBus parentEventBus) {
+    if (isPrivateEventBus(busType)) {
+      return handlePrivateBus(busType,subscriber,parentEventBus);
+    }
+
+    return handleGlobalBus(busType, subscriber,parentEventBus);
+  }
+
+  private <T extends EventBus> boolean isPrivateEventBus(Class<T> busType) {
+    return busType.getAnnotation(PrivateEventBus.class) != null;
+  }
+
+  private <T extends EventBus> T handleGlobalBus(Class<T> busType, Object subscriber,EventBus parentEventBus) {
+      if (!eventBusses.containsKey(busType)) {
+        eventBusses.put(busType, create(busType,parentEventBus));
+      }
+      this.handlerRegistry.addReceiver(subscriber);
+      EventBus eventBus = eventBusses.get(busType);
+      return (T) eventBus;
+  }
+
+  protected <T extends EventBus> T handlePrivateBus(Class<T> type, Object subscriber,EventBus parentEventBus) {
+    IEventReceiverRegistry privateHandlerRegistry = new EventReceiverRegistry();
+    privateHandlerRegistry.addReceiver(subscriber);
+    T bus = EventBusHandlerProxyFactory.createEventBusHandler(type, privateHandlerRegistry,parentEventBus);
+    return bus;
+  }
+
+    /**
    * Add a subscriber.
    * @param subscriber
    */
@@ -59,6 +84,10 @@ public class EventBusManager {
    * @return
    */
   public <T extends EventBus> T getEventBus(Class<? extends EventBus> busType) {
+    if (isPrivateEventBus(busType)) {
+      throw new IllegalArgumentException("The bus " + busType + " is marked as private and it can be retrieved only from his presenter");
+    }
+
     assertEventBus(busType);
     return (T) eventBusses.get(busType);
   }
@@ -74,21 +103,17 @@ public class EventBusManager {
    */
   private <T extends EventBus> void assertEventBus(Class<T> busType) {
     if (!eventBusses.containsKey(busType)) {
-      eventBusses.put(busType, create(busType));
+      eventBusses.put(busType, create(busType,null));
     }
   }
 
-  /**
-   * 
-   * @param <T>
-   * @param type
-   * @return
-   */
-  protected <T extends EventBus> T create(Class<T> type) {
-    EventBusHandler handler = new EventBusHandler(this, handlerRegistry, type.getName());
-    T bus = (T) Proxy.newProxyInstance(type.getClassLoader(), new Class[] { type }, handler);
+
+  private <T extends EventBus> T create(Class<T> type, EventBus parentEventBus) {
+    T bus = EventBusHandlerProxyFactory.createEventBusHandler(type, handlerRegistry,parentEventBus);
     // busHandlers.put(bus, handler);
     return bus;
   }
+
+
 
 }

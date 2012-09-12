@@ -1,60 +1,152 @@
 package org.vaadin.mvp.eventbus;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.lang.reflect.Method;
-
+import junit.framework.Assert;
+import org.easymock.IAnswer;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.vaadin.mvp.eventbus.EventBusManager;
-import org.vaadin.mvp.eventbus.annotation.Event;
 
+import java.lang.reflect.Method;
+import java.util.concurrent.Future;
 
+import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.expectLastCall;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: apalumbo
+ * Date: 8/30/12
+ * Time: 6:33 PM
+ */
 public class EventBusHandlerTest {
 
-  /** Logger */
-  private static final Logger logger = LoggerFactory.getLogger(EventBusHandlerTest.class);
-  private StubEventBus instance;
-  private StubPresenter presenter;
-  private OtherPresenter otherPresenter;
+  private static final String SAMPLE_EVENT = "sampleEvent";
+  private EventBusHandler eventBusHandler;
+
+  private IEventReceiverRegistry mainEventReceiverRegistry;
 
   @Before
   public void setUp() {
-    EventBusManager eventBusManager = new EventBusManager();
-    presenter = new StubPresenter();
-    otherPresenter = new OtherPresenter();
-    eventBusManager.addSubscriber(presenter);
-    eventBusManager.addSubscriber(otherPresenter);
-    instance = eventBusManager.create(StubEventBus.class);
+    mainEventReceiverRegistry = createMock(IEventReceiverRegistry.class);
+  }
+
+
+  @Test
+  public void testGlobalEventsDelivery() {
+
+    StubPresenter stubPresenter = createMock(StubPresenter.class);
+    expect(mainEventReceiverRegistry.lookupReceiver(StubPresenter.class)).andReturn(stubPresenter);
+    stubPresenter.onGlobalEvent(SAMPLE_EVENT);
+
+    OtherPresenter otherPresenter = createMock(OtherPresenter.class);
+    expect(mainEventReceiverRegistry.lookupReceiver(OtherPresenter.class)).andReturn(otherPresenter);
+    otherPresenter.onGlobalEvent(SAMPLE_EVENT);
+
+    replay(mainEventReceiverRegistry,stubPresenter,otherPresenter);
+
+    StubEventBus eventBus = EventBusHandlerProxyFactory.createEventBusHandler(StubEventBus.class, mainEventReceiverRegistry, null);
+    eventBus.globalEvent(SAMPLE_EVENT);
+
+    verify(mainEventReceiverRegistry,stubPresenter,otherPresenter);
+
   }
 
   @Test
-  public void testAnnotations() {
-    Method[] events = StubEventBus.class.getMethods();
-    for (Method event : events) {
-      logger.info("Event method: {} - handlers: ", event.getName());
-      Event ea = event.getAnnotation(Event.class);
-      for (Class<?> handler : ea.handlers()) {
-        logger.info("- {}", handler.getName());
-      }
-    }
+  public void testEventsDelivery() {
+
+    final EventArgument eventArgument = new EventArgument(1l,"test");
+
+    StubPresenter stubPresenter = createMock(StubPresenter.class);
+    expect(mainEventReceiverRegistry.lookupReceiver(StubPresenter.class)).andReturn(stubPresenter);
+    stubPresenter.onSelectMenuEntry(eventArgument);
+
+    replay(mainEventReceiverRegistry,stubPresenter);
+
+    StubEventBus eventBus = EventBusHandlerProxyFactory.createEventBusHandler(StubEventBus.class, mainEventReceiverRegistry, null);
+
+    eventBus.selectMenuEntry(eventArgument);
+
+    verify(mainEventReceiverRegistry,stubPresenter);
+
   }
 
   @Test
-  public void testFireEvent() {
-    instance.selectMenuEntry(new EventArgument(1l, "TestMenu"));
-    assertTrue("event has not been propagated to presenter", presenter.eventReceived);
-    assertFalse("event should not have gone to the other presenter", otherPresenter.received);
+  public void testParentFallbackEventsDelivery_notExistingEventOnChildWillBeForwarded() throws Exception{
+
+    StubPrivateEventBus parentEventBus = createNiceMock(StubPrivateEventBus.class);
+    parentEventBus.niceEvent();
+
+    replay(mainEventReceiverRegistry, parentEventBus);
+
+    StubEventBus eventBus = EventBusHandlerProxyFactory.createEventBusHandler(StubEventBus.class, mainEventReceiverRegistry,parentEventBus);
+
+    Class<? extends EventBus> eventBusType = eventBus.getClass();
+    Method method = eventBusType.getMethod("niceEvent");
+    method.invoke(eventBus); // invoke without argument
+
+    verify(mainEventReceiverRegistry,parentEventBus);
+
   }
-  
+
   @Test
-  public void testFireGlobalEvent() {
-    instance.globalEvent("Message to every body!");
-    assertTrue("event has not been propagated to presenter", presenter.eventReceived);
-    assertTrue("event has not been propagated to other presenter", otherPresenter.received);
+  public void testParentFallbackEventsDelivery_existingEventOnChildWillNotBeForwarded() throws Exception{
+
+    final EventArgument eventArgument = new EventArgument(1l,"test");
+
+    StubPresenter stubPresenter = createMock(StubPresenter.class);
+    expect(mainEventReceiverRegistry.lookupReceiver(StubPresenter.class)).andReturn(stubPresenter);
+    stubPresenter.onSelectMenuEntry(eventArgument);
+
+    StubPrivateEventBus parentEventBus = createNiceMock(StubPrivateEventBus.class);
+
+    replay(mainEventReceiverRegistry, parentEventBus,stubPresenter);
+
+    StubEventBus eventBus = EventBusHandlerProxyFactory.createEventBusHandler(StubEventBus.class, mainEventReceiverRegistry,parentEventBus);
+
+    eventBus.selectMenuEntry(eventArgument);
+
+    verify(mainEventReceiverRegistry,parentEventBus,stubPresenter);
+
+  }
+
+  @Test(expected = Exception.class)
+  public void testParentFallbackEventsDelivery_existingEventOnChild_exceptionThrown() throws Exception{
+
+    final EventArgument eventArgument = new EventArgument(1l,"test");
+
+    StubPresenter stubPresenter = createMock(StubPresenter.class);
+    expect(mainEventReceiverRegistry.lookupReceiver(StubPresenter.class)).andReturn(stubPresenter);
+    stubPresenter.onSelectMenuEntry(eventArgument);
+    expectLastCall().andThrow(new RuntimeException());
+
+    StubPrivateEventBus parentEventBus = createNiceMock(StubPrivateEventBus.class);
+
+    replay(mainEventReceiverRegistry, parentEventBus,stubPresenter);
+
+    StubEventBus eventBus = EventBusHandlerProxyFactory.createEventBusHandler(StubEventBus.class, mainEventReceiverRegistry,parentEventBus);
+
+    eventBus.selectMenuEntry(eventArgument);
+
+    verify(mainEventReceiverRegistry,parentEventBus,stubPresenter);
+
+  }
+
+  @Test(expected = Exception.class)
+  public void testParentFallbackEventsDelivery_notExistingEventOnChildWillBeForwarded_exceptionIsThrown() throws Exception{
+
+    StubPrivateEventBus parentEventBus = createNiceMock(StubPrivateEventBus.class);
+    parentEventBus.niceEvent();
+    expectLastCall().andThrow(new RuntimeException());
+
+    replay(mainEventReceiverRegistry, parentEventBus);
+
+    StubEventBus eventBus = EventBusHandlerProxyFactory.createEventBusHandler(StubEventBus.class, mainEventReceiverRegistry,parentEventBus);
+
+    Class<? extends EventBus> eventBusType = eventBus.getClass();
+    Method method = eventBusType.getMethod("niceEvent");
+    method.invoke(eventBus); // invoke without argument
+
+    verify(mainEventReceiverRegistry,parentEventBus);
+
   }
 
 }
