@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.Future;
 
 import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.expectLastCall;
 
 /**
  * Created by IntelliJ IDEA.
@@ -71,17 +72,8 @@ public class EventBusHandlerTest {
   @Test
   public void testParentFallbackEventsDelivery_notExistingEventOnChildWillBeForwarded() throws Exception{
 
-    final BooleanHolder booleanHolder = new BooleanHolder();
-
     StubPrivateEventBus parentEventBus = createNiceMock(StubPrivateEventBus.class);
     parentEventBus.niceEvent();
-
-    // this test has to be written in that way because no exception is forwarded by the EventBusHandler. This need to be
-    // corrected. A strict mock will throw an exception in case of the event is not expected, the the handler will swallow this exception
-    // so it is not possible to be sure if the method as been called or not.
-    // When the swallow bug will be fixed it will be possible to use a strict mock for the test
-    final IAnswer<Object> answer = createStubAnswer(booleanHolder);
-    expectLastCall().andStubAnswer(answer);
 
     replay(mainEventReceiverRegistry, parentEventBus);
 
@@ -92,8 +84,6 @@ public class EventBusHandlerTest {
     method.invoke(eventBus); // invoke without argument
 
     verify(mainEventReceiverRegistry,parentEventBus);
-
-    Assert.assertTrue("Parent bus event not called",booleanHolder.methodCalled);
 
   }
 
@@ -118,23 +108,45 @@ public class EventBusHandlerTest {
 
   }
 
-  private IAnswer<Object> createStubAnswer(final BooleanHolder booleanHolder) {
-    return new IAnswer<Object>() {
-        @Override
-        public Object answer() throws Throwable {
-          booleanHolder.methodCalled = true;
-          return null;
-        }
-      };
+  @Test(expected = Exception.class)
+  public void testParentFallbackEventsDelivery_existingEventOnChild_exceptionThrown() throws Exception{
+
+    final EventArgument eventArgument = new EventArgument(1l,"test");
+
+    StubPresenter stubPresenter = createMock(StubPresenter.class);
+    expect(mainEventReceiverRegistry.lookupReceiver(StubPresenter.class)).andReturn(stubPresenter);
+    stubPresenter.onSelectMenuEntry(eventArgument);
+    expectLastCall().andThrow(new RuntimeException());
+
+    StubPrivateEventBus parentEventBus = createNiceMock(StubPrivateEventBus.class);
+
+    replay(mainEventReceiverRegistry, parentEventBus,stubPresenter);
+
+    StubEventBus eventBus = EventBusHandlerProxyFactory.createEventBusHandler(StubEventBus.class, mainEventReceiverRegistry,parentEventBus);
+
+    eventBus.selectMenuEntry(eventArgument);
+
+    verify(mainEventReceiverRegistry,parentEventBus,stubPresenter);
+
   }
 
-  private static class BooleanHolder {
+  @Test(expected = Exception.class)
+  public void testParentFallbackEventsDelivery_notExistingEventOnChildWillBeForwarded_exceptionIsThrown() throws Exception{
 
-    public boolean methodCalled = false;
+    StubPrivateEventBus parentEventBus = createNiceMock(StubPrivateEventBus.class);
+    parentEventBus.niceEvent();
+    expectLastCall().andThrow(new RuntimeException());
+
+    replay(mainEventReceiverRegistry, parentEventBus);
+
+    StubEventBus eventBus = EventBusHandlerProxyFactory.createEventBusHandler(StubEventBus.class, mainEventReceiverRegistry,parentEventBus);
+
+    Class<? extends EventBus> eventBusType = eventBus.getClass();
+    Method method = eventBusType.getMethod("niceEvent");
+    method.invoke(eventBus); // invoke without argument
+
+    verify(mainEventReceiverRegistry,parentEventBus);
 
   }
-
-
-
 
 }
