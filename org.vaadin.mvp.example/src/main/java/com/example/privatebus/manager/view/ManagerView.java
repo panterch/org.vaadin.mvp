@@ -1,10 +1,10 @@
 package com.example.privatebus.manager.view;
 
-import com.example.privatebus.greeting.view.IGreetingView;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
 import org.vaadin.mvp.uibinder.IUiBindable;
 import org.vaadin.mvp.uibinder.annotation.UiField;
+
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
 
 /**
  * @author: apalumbo
