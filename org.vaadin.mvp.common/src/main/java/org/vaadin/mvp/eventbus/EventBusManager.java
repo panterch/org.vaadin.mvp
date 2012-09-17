@@ -1,10 +1,9 @@
 package org.vaadin.mvp.eventbus;
 
-import org.vaadin.mvp.eventbus.annotation.PrivateEventBus;
-
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.vaadin.mvp.eventbus.annotation.PrivateEventBus;
 
 /**
  * Create new instances of a typed event bus.
@@ -54,12 +53,12 @@ public class EventBusManager {
   }
 
   private <T extends EventBus> T handleGlobalBus(Class<T> busType, Object subscriber,EventBus parentEventBus) {
-      if (!eventBusses.containsKey(busType)) {
-        eventBusses.put(busType, create(busType,parentEventBus));
-      }
-      this.handlerRegistry.addReceiver(subscriber);
-      EventBus eventBus = eventBusses.get(busType);
-      return (T) eventBus;
+    if (!eventBusses.containsKey(busType)) {
+      eventBusses.put(busType, create(busType,parentEventBus));
+    }
+    this.handlerRegistry.addReceiver(subscriber);
+    EventBus eventBus = eventBusses.get(busType);
+    return busType.cast(eventBus);
   }
 
   protected <T extends EventBus> T handlePrivateBus(Class<T> type, Object subscriber,EventBus parentEventBus) {
@@ -83,13 +82,14 @@ public class EventBusManager {
    * @param busType
    * @return
    */
-  public <T extends EventBus> T getEventBus(Class<? extends EventBus> busType) {
+  public <T extends EventBus> T getEventBus(Class<T> busType) {
     if (isPrivateEventBus(busType)) {
       throw new IllegalArgumentException("The bus " + busType + " is marked as private and it can be retrieved only from his presenter");
     }
 
     assertEventBus(busType);
-    return (T) eventBusses.get(busType);
+    EventBus eventBus = eventBusses.get(busType);
+    return busType.cast(eventBus);
   }
 
   /**
