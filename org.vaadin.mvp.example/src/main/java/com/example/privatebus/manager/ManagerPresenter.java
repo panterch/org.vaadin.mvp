@@ -1,14 +1,14 @@
 package com.example.privatebus.manager;
 
+import org.vaadin.mvp.presenter.FactoryPresenter;
+import org.vaadin.mvp.presenter.IPresenterFactory;
+import org.vaadin.mvp.presenter.annotation.Presenter;
+
 import com.example.mvp.ExampleApp;
 import com.example.privatebus.greeting.GreetingEventBus;
 import com.example.privatebus.greeting.GreetingPresenter;
 import com.example.privatebus.manager.view.IManagerView;
 import com.example.privatebus.manager.view.ManagerView;
-import org.vaadin.mvp.presenter.BasePresenter;
-import org.vaadin.mvp.presenter.FactoryPresenter;
-import org.vaadin.mvp.presenter.IPresenterFactory;
-import org.vaadin.mvp.presenter.annotation.Presenter;
 
 /**
  * @author: apalumbo
