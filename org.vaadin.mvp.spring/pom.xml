@@ -12,16 +12,16 @@
   <name>MVP and UiBinder Spring Integration</name>
   <description><![CDATA[MVP for Vaadin: Spring Framework bindings]]></description>
   <dependencies>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-
+    <!-- Compile dependencies -->
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>org.vaadin.mvp.common</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
 
     <dependency>
@@ -32,6 +32,11 @@
 
     <!-- Test Dependencies -->
     <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
+    
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
@@ -39,13 +44,6 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <version>${spring.version}</version>
     </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-    </dependency>
-
   </dependencies>
 </project>
