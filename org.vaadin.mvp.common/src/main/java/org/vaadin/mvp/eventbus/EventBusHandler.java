@@ -102,7 +102,7 @@ class EventBusHandler implements InvocationHandler {
     return null;
   }
 
-  private void delegateToParent(String methodName,Class[] methodParameterTypes, Object[] args) {
+  private void delegateToParent(String methodName, Class<?>[] methodParameterTypes, Object[] args) {
 
     Method parentMethod = lookupMethodOnParent(methodName, methodParameterTypes);
 
@@ -117,7 +117,7 @@ class EventBusHandler implements InvocationHandler {
     }
   }
 
-  private Method lookupMethodOnParent(String methodName, Class[] methodParameterTypes){
+  private Method lookupMethodOnParent(String methodName, Class<?>[] methodParameterTypes){
     try {
       return parent.getClass().getMethod(methodName, methodParameterTypes);
     } catch (NoSuchMethodException e) {
