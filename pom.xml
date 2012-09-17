@@ -4,7 +4,7 @@
 
   <groupId>org.vaadin.addons</groupId>
   <artifactId>org.vaadin.mvp</artifactId>
-  <version>0.9.2</version>
+  <version>0.9.3-SNAPSHOT</version>
   <name>MVP for Vaadin</name>
   <packaging>pom</packaging>
 
