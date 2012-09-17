@@ -23,6 +23,9 @@ public class MenuPresenter extends BasePresenter<IMenuView, MainEventBus> {
     // create and add private presenter entry
     MenuEntry privatePresenterEntry = new MenuEntry("Private presenter", ManagerPresenter.class);
     addItemToTree(privatePresenterEntry);
+    
+    // set initially selected menu entry
+    this.view.getTree().setValue(userAdminEntry);
   }
 
   private void addItemToTree(MenuEntry userAdminEntry) {
@@ -34,6 +37,9 @@ public class MenuPresenter extends BasePresenter<IMenuView, MainEventBus> {
   public void onSelectMenu(ValueChangeEvent event) {
     // get the selected menu entry and initiate another event
     MenuEntry menuEntry = (MenuEntry) this.view.getTree().getValue();
+    if(menuEntry == null) {
+      return;
+    }
     this.eventBus.openModule(menuEntry.getPresenterType());
   }
 
