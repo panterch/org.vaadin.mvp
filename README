@@ -1,9 +1,0 @@
-MVP for Vaadin
-==============
-
-Get started running 
-
-# mvn site 
-
-and then open target/site/index.html in your browser.
-

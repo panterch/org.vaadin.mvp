@@ -21,12 +21,12 @@ this Maven repository:
 
 Add this repository to your projects pom.xml using a `repositories`-section:
 
-  <repositories>
-    <repository>
-      <id>vaadin-mvp-releases</id>
-      <url>https://java.panter.ch/nexus/content/repositories/oss-releases/</url>
-    </repository>
-  </repositories>
+    <repositories>
+      <repository>
+        <id>vaadin-mvp-releases</id>
+        <url>https://java.panter.ch/nexus/content/repositories/oss-releases/</url>
+      </repository>
+    </repositories>
 
 If you're using a repository manager (Nexus, Archive, ...) then add this repository
 to its configuration.
