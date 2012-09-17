@@ -1,21 +1,21 @@
 package org.vaadin.mvp.eventbus;
 
-import junit.framework.Assert;
-import org.easymock.IAnswer;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+
+import java.lang.reflect.Method;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import java.lang.reflect.Method;
-import java.util.concurrent.Future;
-
-import static org.easymock.EasyMock.*;
-import static org.easymock.EasyMock.expectLastCall;
-
 /**
- * Created by IntelliJ IDEA.
- * User: apalumbo
- * Date: 8/30/12
- * Time: 6:33 PM
+ * Test case for {@link EventBusHandler}.
+ * 
+ * @author apalumbo
  */
 public class EventBusHandlerTest {
 

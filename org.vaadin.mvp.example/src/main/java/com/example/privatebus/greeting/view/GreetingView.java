@@ -6,10 +6,9 @@ import org.vaadin.mvp.uibinder.IUiBindable;
 import org.vaadin.mvp.uibinder.annotation.UiField;
 
 /**
- * Created by IntelliJ IDEA.
- * User: apalumbo
- * Date: 9/12/12
- * Time: 1:41 AM
+ * Greeting view.
+ * 
+ * @author apalumbo
  */
 public class GreetingView extends VerticalLayout implements IGreetingView, IUiBindable {
 
